@@ -20,3 +20,11 @@ Meticulously follow the steps in README_irdma.txt
     ------              ----------------
     siwdev1             527c6ffffe4f9b48
     siwdev2             527c6ffffe4fb7e0
+
+    siwdev1 will have an IP address of 10.0.1.5
+    siwdev2 will have an IP address of 10.0.1.6
+
+6: To run rping test, run the following in 2 different terminals:
+
+rping -sdvVa 10.0.1.6
+rping -cdvVa 10.0.1.6 -C 10
