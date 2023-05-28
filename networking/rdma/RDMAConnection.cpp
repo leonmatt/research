@@ -5,12 +5,22 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "RDMAConnection.h"
 
+// RDMAConnection Constructor
 RDMAConnection::RDMAConnection(string& deviceName)
 {
 
     devName = deviceName;
 
 }
+
+// RDMAConnection Destructor
+RDMAConnection::~RDMAConnection()
+{
+
+    releaseConnection();
+
+}
+
 
 // Set up a device connection
 bool RDMAConnection::setupConnection(void)
@@ -21,19 +31,44 @@ bool RDMAConnection::setupConnection(void)
     bool ret = setupContext();
     if (ret == false) {
         cout << "Setup context failed. Exiting..." << endl;
-        return ret;
+        goto END;
     }
     cout << "Finished setting up context" << endl;
 
     ret = setupPD();
     if (ret == false){
         cout << "Setup PD failed. Exiting..." << endl;
-        return ret;
+        goto BAD_PD;
     }
     cout << "Finished setting up protection domain" << endl;
 
-    cout << "Device Registered: " << devName << endl << endl;
+    ret = setupCQ();
+    if (ret == false){
+        cout << "Setup CQ failed. Exiting..." << endl;
+        goto BAD_CQ;
+    }
+    cout << "Finished setting up completion queue" << endl;
 
+    ret = setupQP();
+    if (ret == false){
+        cout << "Setup QP failed. Exiting..." << endl;
+        goto BAD_QP;
+    }
+    cout << "Finished setting up  queue pair" << endl;
+
+    cout << "Device Registered: " << devName << endl << endl;
+    goto END;
+
+BAD_QP:
+    releaseCQ();
+
+BAD_CQ:
+    releasePD();
+
+BAD_PD:
+    releaseContext();
+
+END:
     return ret;
 }
 
@@ -45,7 +80,6 @@ bool RDMAConnection::setupContext(void)
     struct ibv_device** devices = ibv_get_device_list(&nDevs);
     if (devices == NULL)
         return (devices != NULL);
-
 
     // Loop through and get the device that we picked
     string tmpDeviceName;
@@ -71,8 +105,9 @@ bool RDMAConnection::setupContext(void)
 // Release a device context
 void RDMAConnection::releaseContext(void)
 {
-
+    if (context != NULL)
     ibv_close_device(context);
+    context = NULL;
 
 }
 
@@ -85,6 +120,8 @@ void RDMAConnection::releaseConnection(void)
 
     releasePD();
 
+    releaseCQ();
+
     cout << "Finished releasing resources for: " << devName << endl;
 
 }
@@ -94,7 +131,6 @@ bool RDMAConnection::setupPD(void)
 {
 
     protectionDomain = ibv_alloc_pd(context);
-
     return (protectionDomain != NULL);
 
 }
@@ -103,7 +139,8 @@ bool RDMAConnection::setupPD(void)
 void RDMAConnection::releasePD(void)
 {
 
-    ibv_dealloc_pd(protectionDomain);
+    if (protectionDomain != NULL)
+        ibv_dealloc_pd(protectionDomain);
     protectionDomain = NULL;
 }
 
@@ -111,18 +148,45 @@ void RDMAConnection::releasePD(void)
 bool RDMAConnection::setupCQ(void)
 {
 
-    //completionQueue = ibv_alloc_pd(context);
-
-    //return (completionQueue != NULL);
-
-    return true;
+    completionQueue = ibv_create_cq(context, 100, NULL, NULL, 0);
+    return (completionQueue != NULL);
 
 }
 
 // Release the completion queue
 void RDMAConnection::releaseCQ(void)
 {
+    if (completionQueue != NULL)
+        ibv_destroy_cq(completionQueue);
+    completionQueue = NULL;
+}
 
-    //ibv_dealloc_pd(completionQueue);
-    //completionQueue = NULL;
+// Set up a queue pair for the connection
+bool RDMAConnection::setupQP(void)
+{
+
+    struct ibv_qp_init_attr qpAttrs;
+    memset(&qpAttrs, 0, sizeof(ibv_qp_init_attr));
+
+    qpAttrs.send_cq = completionQueue;
+    qpAttrs.recv_cq = completionQueue;
+    qpAttrs.cap.max_send_wr  = 1;
+    qpAttrs.cap.max_recv_wr  = 1;
+    qpAttrs.cap.max_send_sge = 1;
+    qpAttrs.cap.max_recv_sge = 1;
+    //Use reliable connection
+    qpAttrs.qp_type = IBV_QPT_RC;
+    qpAttrs.sq_sig_all = 1;
+
+    queuePair = ibv_create_qp(protectionDomain, &qpAttrs);
+    return (queuePair != NULL);
+
+}
+
+// Release the queue pair
+void RDMAConnection::releaseQP(void)
+{
+    if (queuePair != NULL)
+        ibv_destroy_qp(queuePair);
+    queuePair = NULL;
 }
