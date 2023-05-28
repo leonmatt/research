@@ -17,15 +17,36 @@ using namespace std;
 class RDMAConnection {
 
 public:
-    string devName = "";
-    struct ibv_device*  device  = NULL;
-    struct ibv_context* context = NULL;
 
-    bool setupConnection(const string&);
+    string devName;
+
+    RDMAConnection(string&);
+
+    bool setupConnection(void);
     void releaseConnection(void);
 
 private:
-    bool setupContext(const string&);
+
+    // The hardware device
+    struct ibv_device*  device      = NULL;
+
+    // The hardware device context
+    struct ibv_context* context     = NULL;
+
+    // The protection domain
+    struct ibv_pd* protectionDomain = NULL;
+
+    // The completion queue
+    struct ibv_cq* completionQueue  = NULL;
+
+    bool setupContext(void);
+    void releaseContext(void);
+
+    bool setupPD(void);
+    void releasePD(void);
+
+    bool setupCQ(void);
+    void releaseCQ(void);
 
 };
 

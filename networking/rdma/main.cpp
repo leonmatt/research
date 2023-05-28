@@ -17,17 +17,17 @@ void parseConfiguration(const string& configName, string (&names)[2]);
 int main(int argc, char *argv[], char *env[])
 {
 
-    RDMAConnection client;
-    RDMAConnection server;
-
     string fname = "config.txt";
     string connectionNames[2];
 
     parseConfiguration(fname, connectionNames);
 
+    RDMAConnection client(connectionNames[0]);
+    RDMAConnection server(connectionNames[1]);
+
     // Set up the infiniband connections
-    client.setupConnection(connectionNames[0]);
-    server.setupConnection(connectionNames[1]);
+    client.setupConnection();
+    server.setupConnection();
 
     // Release the infiniband connections
     client.releaseConnection();
