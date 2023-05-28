@@ -46,11 +46,13 @@ bool RDMAConnection::setupContext(void)
     if (devices == NULL)
         return (devices != NULL);
 
+
     // Loop through and get the device that we picked
     string tmpDeviceName;
     for (int i = 0; i < nDevs; i++) {
         tmpDeviceName = ibv_get_device_name(devices[i]);
         if (devName.compare(tmpDeviceName) == 0) {
+
             device  = devices[i];
             context = ibv_open_device(device);
             devName = tmpDeviceName;
