@@ -21,6 +21,7 @@ public:
     string devName;
 
     RDMAConnection(string&);
+    ~RDMAConnection();
 
     bool setupConnection(void);
     void releaseConnection(void);
@@ -39,6 +40,9 @@ private:
     // The completion queue
     struct ibv_cq* completionQueue  = NULL;
 
+    // The queue pair
+    struct ibv_qp* queuePair        = NULL;
+
     bool setupContext(void);
     void releaseContext(void);
 
@@ -47,6 +51,9 @@ private:
 
     bool setupCQ(void);
     void releaseCQ(void);
+
+    bool setupQP(void);
+    void releaseQP(void);
 
 };
 
