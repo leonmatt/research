@@ -29,10 +29,6 @@ int main(int argc, char *argv[], char *env[])
     client.setupConnection();
     server.setupConnection();
 
-    // Release the infiniband connections
-    client.releaseConnection();
-    server.releaseConnection();
-
     return 0;
 
 }
