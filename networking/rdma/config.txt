@@ -1,0 +1,2 @@
+client_dev_name = siwdev1
+server_dev_name = siwdev2
