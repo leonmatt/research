@@ -5,6 +5,49 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "RDMAConnection.h"
 
+struct rdma_addrinfo* clearAddrInfo(struct rdma_addrinfo* res)
+{
+
+    struct rdma_addrinfo *tmp = NULL;
+
+    while(res) {
+ 
+        tmp = res;
+        res = res->ai_next;
+
+        if (tmp->ai_src_addr) {
+            free(tmp->ai_src_addr);
+            tmp->ai_src_addr = NULL;
+        }
+        if (tmp->ai_dst_addr) {
+            free(tmp->ai_dst_addr);
+            tmp->ai_dst_addr = NULL;
+        }
+        if (tmp->ai_src_canonname) {
+            free(tmp->ai_src_canonname);
+            tmp->ai_src_canonname = NULL;
+        }     
+        if (tmp->ai_dst_canonname) {
+            free(tmp->ai_dst_canonname);
+            tmp->ai_dst_canonname = NULL;
+        }
+        if (tmp->ai_route) {
+            free(tmp->ai_route);
+            tmp->ai_route = NULL;
+        }
+        if (tmp->ai_connect) {
+            free(tmp->ai_connect);
+            tmp->ai_connect = NULL;
+        }
+        free(tmp);
+        tmp = NULL;     
+    }
+    res = NULL;
+
+    return res;
+
+}
+
 // RDMAConnection Constructor
 RDMAConnection::RDMAConnection(string& deviceName)
 {
@@ -21,172 +64,209 @@ RDMAConnection::~RDMAConnection()
 
 }
 
-
-// Set up a device connection
-bool RDMAConnection::setupConnection(void)
+bool RDMAConnection::setupConnection(string server, string portnum)
 {
 
-    cout << "Setting up connection for device: " << devName << endl;
+	struct rdma_addrinfo hints = {0};
+    struct rdma_addrinfo* res  = NULL;
+	struct ibv_qp_init_attr attr = {0}, initAttr = {0};
+    struct ibv_qp_attr qpAttr = {};
 
-    bool ret = setupContext();
-    if (ret == false) {
-        cout << "Setup context failed. Exiting..." << endl;
-        goto END;
+    struct rdma_conn_param connectionParams = {0};
+	
+    struct ibv_mr *recvMR = NULL, *sendMR = NULL;
+
+    bool isServer = false;
+
+	int ret = -1;
+
+    uint8_t *recvBuffer = NULL, *sendBuffer = NULL;
+
+    recvBuffer = new (nothrow) uint8_t[1024];
+    if (recvBuffer == NULL) {
+        cerr << "Failed to allocate the comms buffer." << endl;
+        goto BAD_RECV_BUFFER;
+    };
+
+    sendBuffer = new (nothrow) uint8_t[1024];
+    if (sendBuffer == NULL) {
+        cerr << "Failed to allocate the comms buffer." << endl;
+        goto BAD_SEND_BUFFER;
+    };
+
+    // Determine if this is server or client
+    if (server.compare("0.0.0.0") == 0)
+        isServer = true;
+
+    // Set up the type of connection
+    if (isServer) {
+        hints.ai_flags      = RAI_PASSIVE;
+        hints.ai_qp_type    = IBV_QPT_RC;
     }
-    cout << "Finished setting up context" << endl;
+    hints.ai_port_space = RDMA_PS_TCP;
 
-    ret = setupPD();
-    if (ret == false){
-        cout << "Setup PD failed. Exiting..." << endl;
-        goto BAD_PD;
+    // Get the server's addr info
+    ret = rdma_getaddrinfo(server.c_str(), portnum.c_str(), &hints, &res);
+    if (ret != 0) {
+        cerr << "Failed to get addr info." << ret << endl << flush;
+        goto BAD_ADDRINFO;
     }
-    cout << "Finished setting up protection domain" << endl;
 
-    ret = setupCQ();
-    if (ret == false){
-        cout << "Setup CQ failed. Exiting..." << endl;
-        goto BAD_CQ;
+    // Set the communication line details
+    attr.cap.max_send_wr = 1;
+	attr.cap.max_recv_wr = 1;
+	attr.cap.max_send_sge = 1;
+	attr.cap.max_recv_sge = 1;
+	attr.cap.max_inline_data = 16;
+    attr.sq_sig_all = 1;
+
+    if (!isServer) {
+        attr.qp_context = connectionID;
     }
-    cout << "Finished setting up completion queue" << endl;
 
-    ret = setupQP();
-    if (ret == false){
-        cout << "Setup QP failed. Exiting..." << endl;
-        goto BAD_QP;
-    }
-    cout << "Finished setting up  queue pair" << endl;
-
-    cout << "Device Registered: " << devName << endl << endl;
-    goto END;
-
-BAD_QP:
-    releaseCQ();
-
-BAD_CQ:
-    releasePD();
-
-BAD_PD:
-    releaseContext();
-
-END:
-    return ret;
-}
-
-// Open a device context so the device can be used
-bool RDMAConnection::setupContext(void)
-{
-
-    int nDevs = 0;
-    struct ibv_device** devices = ibv_get_device_list(&nDevs);
-    if (devices == NULL)
-        return (devices != NULL);
-
-    // Loop through and get the device that we picked
-    string tmpDeviceName;
-    for (int i = 0; i < nDevs; i++) {
-        tmpDeviceName = ibv_get_device_name(devices[i]);
-        if (devName.compare(tmpDeviceName) == 0) {
-
-            device  = devices[i];
-            context = ibv_open_device(device);
-            devName = tmpDeviceName;
-            i = nDevs;
+    // Create the communication endpoint
+    ret = rdma_create_ep(&connectionID, res, NULL, &attr);
+        if (ret != 0) {
+            cerr << "Failed to create endpoint." << errno << endl;
+            goto BAD_ENDPOINT;
         }
 
+    if (isServer) {
+
+        // Set the endpoint to listen
+        ret = rdma_listen(connectionID, 1);
+        if (ret != 0) {
+            cerr << "Server failed to listen." << endl;
+            goto BAD_SERVER_CALL;
+        }
+
+        // Receive a request to connect
+        ret = rdma_get_request(connectionID, &connectionID);
+        if (ret != 0) {
+            cerr << "Server failed to get request from listening." << endl;
+            goto BAD_SERVER_CALL;
+        }
+        
+        // Get the details of the queue pair from the incoming connection
+        ret = ibv_query_qp(connectionID->qp, &qpAttr, IBV_QP_CAP, &initAttr);
+        if (ret != 0) {
+            cerr << "Server failed to query the QP." << endl;
+            goto BAD_SERVER_CALL;
+        }
+
+        // Set up receive buffer
+        recvMR = rdma_reg_msgs(connectionID, recvBuffer, 1024);
+        if (recvMR == NULL) {
+            ret = -1;
+            cerr << "Server failed to register receive buffer";
+            goto BAD_SERVER_CALL;
+        }
+
+        // Set up send buffer
+        sendMR = rdma_reg_msgs(connectionID, sendBuffer, 1024);
+        if (sendMR == NULL) {
+            ret = -1;
+            cerr << "Server failed to register send buffer";
+            goto BAD_SERVER_CALL;
+        }
+
+        // Receive incoming connection request
+	    ret = rdma_post_recv(connectionID, NULL, recvBuffer, 1024, recvMR);
+	    if (ret != 0) {
+            cerr << "Server failed to receive connection message";
+	    	goto BAD_SERVER_CALL;
+	    }        
+
+        // Accept the connection
+        ret = rdma_accept(connectionID, &connectionParams);
+        if (ret != 0) {
+            cerr << "Server failed to accept." << endl;
+            goto BAD_SERVER_CALL;
+        }
+
+        cout << "Server has connected to client" << endl << flush;
+
+    }
+    
+    else {
+
+        // Set up receive buffer
+        recvMR = rdma_reg_msgs(connectionID, recvBuffer, 1024);
+        if (recvMR == NULL) {
+            ret = -1;
+            cerr << "Server failed to register receive buffer";
+            goto BAD_SERVER_CALL;
+        }
+
+        // Set up send buffer
+        sendMR = rdma_reg_msgs(connectionID, sendBuffer, 1024);
+        if (sendMR == NULL) {
+            ret = -1;
+            cerr << "Server failed to register send buffer";
+            goto BAD_SERVER_CALL;
+        }
+
+        // Receive connection request response
+	    ret = rdma_post_recv(connectionID, NULL, recvBuffer, 16, recvMR);
+	    if (ret) {
+            cerr << "Client failed to post receive work request." << endl;
+		    goto BAD_CLIENT_CALL;
+	    }
+
+        // Connect to server
+        ret = rdma_connect(connectionID, &connectionParams);
+        if (ret != 0) {
+            cerr << "Client failed to connect." << endl;
+            goto BAD_CLIENT_CALL;
+        }
+
+        cout << "Client has connected to the server" << endl << flush;
+
     }
 
-    // Release the device list because we no longer need it
-    ibv_free_device_list(devices);
+    goto SUCCESS;
 
-    return (context != NULL);
+BAD_CLIENT_CALL:
+BAD_SERVER_CALL:
 
+    rdma_destroy_ep(connectionID);
+
+BAD_ENDPOINT:
+BAD_ADDRINFO:
+
+    delete sendBuffer;
+    sendBuffer = NULL;
+
+BAD_SEND_BUFFER:
+
+    delete recvBuffer;
+    recvBuffer = NULL;
+
+BAD_RECV_BUFFER:
+SUCCESS:
+    
+    res = clearAddrInfo(res);
+
+    return (ret == 0);
 }
 
-// Release a device context
-void RDMAConnection::releaseContext(void)
-{
-    if (context != NULL)
-    ibv_close_device(context);
-    context = NULL;
-
-}
-
-// Release a device connection
 void RDMAConnection::releaseConnection(void)
 {
+    if (connectionID != NULL) {
+        rdma_disconnect(connectionID);
+        connectionID = NULL;
+    }
 
-    device           = NULL;
-    context          = NULL;
+    connectionIP = "";
 
-    releasePD();
+    if (recvMR != NULL) {
+       ibv_dereg_mr(recvMR);
+        recvMR = NULL;
+    }
 
-    releaseCQ();
-
-    cout << "Finished releasing resources for: " << devName << endl;
-
-}
-
-// Set up a protection domain for the host machine
-bool RDMAConnection::setupPD(void)
-{
-
-    protectionDomain = ibv_alloc_pd(context);
-    return (protectionDomain != NULL);
-
-}
-
-// Release the protection domain
-void RDMAConnection::releasePD(void)
-{
-
-    if (protectionDomain != NULL)
-        ibv_dealloc_pd(protectionDomain);
-    protectionDomain = NULL;
-}
-
-// Set up a completion queue for the device
-bool RDMAConnection::setupCQ(void)
-{
-
-    completionQueue = ibv_create_cq(context, 100, NULL, NULL, 0);
-    return (completionQueue != NULL);
-
-}
-
-// Release the completion queue
-void RDMAConnection::releaseCQ(void)
-{
-    if (completionQueue != NULL)
-        ibv_destroy_cq(completionQueue);
-    completionQueue = NULL;
-}
-
-// Set up a queue pair for the connection
-bool RDMAConnection::setupQP(void)
-{
-
-    struct ibv_qp_init_attr qpAttrs;
-    memset(&qpAttrs, 0, sizeof(ibv_qp_init_attr));
-
-    qpAttrs.send_cq = completionQueue;
-    qpAttrs.recv_cq = completionQueue;
-    qpAttrs.cap.max_send_wr  = 1;
-    qpAttrs.cap.max_recv_wr  = 1;
-    qpAttrs.cap.max_send_sge = 1;
-    qpAttrs.cap.max_recv_sge = 1;
-    //Use reliable connection
-    qpAttrs.qp_type = IBV_QPT_RC;
-    qpAttrs.sq_sig_all = 1;
-
-    queuePair = ibv_create_qp(protectionDomain, &qpAttrs);
-    return (queuePair != NULL);
-
-}
-
-// Release the queue pair
-void RDMAConnection::releaseQP(void)
-{
-    if (queuePair != NULL)
-        ibv_destroy_qp(queuePair);
-    queuePair = NULL;
+    if (sendMR != NULL) {
+       ibv_dereg_mr(sendMR);
+        sendMR = NULL;
+    }
+    
 }

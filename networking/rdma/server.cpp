@@ -12,28 +12,28 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace std;
 
-void parseConfiguration(const string& configName, string (&names)[2]);
+void parseConfiguration(const string& configName, string (&vars)[4]);
 
 int main(int argc, char *argv[], char *env[])
 {
 
     string fname = "config.txt";
-    string connectionNames[2];
+    string vars[4];
 
-    parseConfiguration(fname, connectionNames);
+    parseConfiguration(fname, vars);
 
-    RDMAConnection client(connectionNames[0]);
-    RDMAConnection server(connectionNames[1]);
+    // Allocate the infiniband connection
+    cout << "Setting up connection for device: " << vars[1] << endl;
+    RDMAConnection rdmaServer(vars[1]);
 
-    // Set up the infiniband connections
-    client.setupConnection();
-    server.setupConnection();
+    // Set up the infiniband connection
+    rdmaServer.setupConnection("0.0.0.0", vars[3]);
 
     return 0;
 
 }
 
-void parseConfiguration(const string& configName, string (&names)[2])
+void parseConfiguration(const string& configName, string (&vars)[4])
 {
     ifstream configFile;
     string delim = "=";
@@ -42,15 +42,21 @@ void parseConfiguration(const string& configName, string (&names)[2])
     if (configFile.is_open()) {
     
         while (getline(configFile, line)) {
+            if (line.compare("") == 0)
+                continue;
             size_t pos = line.find(delim);
             key   = line.substr(0, pos);
             value = line.substr(pos+1);
             key.erase(remove_if(key.begin(), key.end(), ::isspace), key.end());
             value.erase(remove_if(value.begin(), value.end(), ::isspace), value.end());
             if(key.compare("client_dev_name") == 0)
-                names[0] = value;
+                vars[0] = value;
             if(key.compare("server_dev_name") == 0)
-                names[1] = value;
+                vars[1] = value;
+            if(key.compare("server_ip") == 0)
+                vars[2] = value;
+            if(key.compare("server_port") == 0)
+                vars[3] = value;
 
         }
 

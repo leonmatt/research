@@ -10,7 +10,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 
-#include <infiniband/verbs.h>
+#include <netdb.h>
+
+#include <rdma/rdma_verbs.h>
+#include <rdma/rdma_cma.h>
 
 using namespace std;
 
@@ -23,37 +26,22 @@ public:
     RDMAConnection(string&);
     ~RDMAConnection();
 
-    bool setupConnection(void);
+    bool setupConnection(string, string);
     void releaseConnection(void);
+
+    //bool setQPState(enum ibv_qp_state);
 
 private:
 
-    // The hardware device
-    struct ibv_device*  device      = NULL;
+    // The communication socket
+    struct rdma_cm_id *connectionID = NULL;
 
-    // The hardware device context
-    struct ibv_context* context     = NULL;
+    // The receive and send buffers
+    struct ibv_mr* recvMR = NULL;
+    struct ibv_mr* sendMR = NULL;
 
-    // The protection domain
-    struct ibv_pd* protectionDomain = NULL;
-
-    // The completion queue
-    struct ibv_cq* completionQueue  = NULL;
-
-    // The queue pair
-    struct ibv_qp* queuePair        = NULL;
-
-    bool setupContext(void);
-    void releaseContext(void);
-
-    bool setupPD(void);
-    void releasePD(void);
-
-    bool setupCQ(void);
-    void releaseCQ(void);
-
-    bool setupQP(void);
-    void releaseQP(void);
+    // The IP that we connected to or binded to
+    string connectionIP;
 
 };
 

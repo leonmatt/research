@@ -1,16 +1,21 @@
 CPP = g++
-CFLAGS = -std=c++11 -Wall -pedantic
+CFLAGS = -std=c++11 -Wall -pedantic 
 VFLAGS = -lrdmacm -libverbs
 
-all: RDMAConnection Main
+all: RDMAConnection client server
 
 clean:
 	rm *.o
-	rm main
+	rm client
+	rm server
 
 RDMAConnection: RDMAConnection.cpp
 	$(CPP) $(CFLAGS) -c RDMAConnection.cpp $(VFLAGS)
 
-Main: main.cpp
-	$(CPP) $(CFLAGS) -c main.cpp 
-	$(CPP) $(CFLAGS) -o main main.o RDMAConnection.o $(VFLAGS)
+client: client.cpp
+	$(CPP) $(CFLAGS) -c client.cpp 
+	$(CPP) $(CFLAGS) -o client client.o RDMAConnection.o $(VFLAGS)
+
+server: server.cpp
+	$(CPP) $(CFLAGS) -c server.cpp 
+	$(CPP) $(CFLAGS) -o server server.o RDMAConnection.o $(VFLAGS)
