@@ -19,4 +19,3 @@ sudo ifconfig enp2s0f0 10.0.1.6
 # Add both cards to rdma link using soft-iwarp
 sudo rdma link add siwdev1 type siw netdev enp1s0f0
 sudo rdma link add siwdev2 type siw netdev enp2s0f0
-
