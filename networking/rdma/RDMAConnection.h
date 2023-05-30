@@ -29,7 +29,8 @@ public:
     bool setupConnection(string, string);
     void releaseConnection(void);
 
-    //bool setQPState(enum ibv_qp_state);
+    int receiveMSG(string&);
+    int sendMSG(string&);
 
 private:
 
