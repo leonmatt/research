@@ -29,6 +29,13 @@ int main(int argc, char *argv[], char *env[])
     // Set up the infiniband connection
     rdmaServer.setupConnection("0.0.0.0", vars[3]);
 
+    string msg = "";
+
+    string& msgRef = msg;
+
+    while (true)
+        rdmaServer.receiveMSG(msgRef);
+
     return 0;
 
 }

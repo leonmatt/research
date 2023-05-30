@@ -72,9 +72,9 @@ bool RDMAConnection::setupConnection(string server, string portnum)
 	struct ibv_qp_init_attr attr = {0}, initAttr = {0};
     struct ibv_qp_attr qpAttr = {};
 
+    struct rdma_cm_id *tmpID;
+
     struct rdma_conn_param connectionParams = {0};
-	
-    struct ibv_mr *recvMR = NULL, *sendMR = NULL;
 
     bool isServer = false;
 
@@ -121,27 +121,27 @@ bool RDMAConnection::setupConnection(string server, string portnum)
     attr.sq_sig_all = 1;
 
     if (!isServer) {
-        attr.qp_context = connectionID;
+        attr.qp_context = tmpID;
     }
 
     // Create the communication endpoint
-    ret = rdma_create_ep(&connectionID, res, NULL, &attr);
-        if (ret != 0) {
-            cerr << "Failed to create endpoint." << errno << endl;
-            goto BAD_ENDPOINT;
-        }
+    ret = rdma_create_ep(&tmpID, res, NULL, &attr);
+    if (ret != 0) {
+        cerr << "Failed to create endpoint." << errno << endl;
+        goto BAD_ENDPOINT;
+    }
 
     if (isServer) {
 
         // Set the endpoint to listen
-        ret = rdma_listen(connectionID, 1);
+        ret = rdma_listen(tmpID, 1);
         if (ret != 0) {
             cerr << "Server failed to listen." << endl;
             goto BAD_SERVER_CALL;
         }
 
         // Receive a request to connect
-        ret = rdma_get_request(connectionID, &connectionID);
+        ret = rdma_get_request(tmpID, &connectionID);
         if (ret != 0) {
             cerr << "Server failed to get request from listening." << endl;
             goto BAD_SERVER_CALL;
@@ -154,8 +154,10 @@ bool RDMAConnection::setupConnection(string server, string portnum)
             goto BAD_SERVER_CALL;
         }
 
+        cout << "About to set up MRs" << endl;
+
         // Set up receive buffer
-        recvMR = rdma_reg_msgs(connectionID, recvBuffer, 1024);
+        recvMR = rdma_reg_msgs(connectionID, recvBuffer, 16);
         if (recvMR == NULL) {
             ret = -1;
             cerr << "Server failed to register receive buffer";
@@ -163,7 +165,7 @@ bool RDMAConnection::setupConnection(string server, string portnum)
         }
 
         // Set up send buffer
-        sendMR = rdma_reg_msgs(connectionID, sendBuffer, 1024);
+        sendMR = rdma_reg_msgs(connectionID, sendBuffer, 16);
         if (sendMR == NULL) {
             ret = -1;
             cerr << "Server failed to register send buffer";
@@ -171,7 +173,7 @@ bool RDMAConnection::setupConnection(string server, string portnum)
         }
 
         // Receive incoming connection request
-	    ret = rdma_post_recv(connectionID, NULL, recvBuffer, 1024, recvMR);
+	    ret = rdma_post_recv(connectionID, NULL, recvBuffer, 16, recvMR);
 	    if (ret != 0) {
             cerr << "Server failed to receive connection message";
 	    	goto BAD_SERVER_CALL;
@@ -190,8 +192,10 @@ bool RDMAConnection::setupConnection(string server, string portnum)
     
     else {
 
+        connectionID = tmpID;
+
         // Set up receive buffer
-        recvMR = rdma_reg_msgs(connectionID, recvBuffer, 1024);
+        recvMR = rdma_reg_msgs(connectionID, recvBuffer, 16);
         if (recvMR == NULL) {
             ret = -1;
             cerr << "Server failed to register receive buffer";
@@ -199,7 +203,7 @@ bool RDMAConnection::setupConnection(string server, string portnum)
         }
 
         // Set up send buffer
-        sendMR = rdma_reg_msgs(connectionID, sendBuffer, 1024);
+        sendMR = rdma_reg_msgs(connectionID, sendBuffer, 16);
         if (sendMR == NULL) {
             ret = -1;
             cerr << "Server failed to register send buffer";
@@ -207,7 +211,7 @@ bool RDMAConnection::setupConnection(string server, string portnum)
         }
 
         // Receive connection request response
-	    ret = rdma_post_recv(connectionID, NULL, recvBuffer, 16, recvMR);
+	    ret = rdma_post_recv(connectionID, NULL, recvBuffer, recvMR->length, recvMR);
 	    if (ret) {
             cerr << "Client failed to post receive work request." << endl;
 		    goto BAD_CLIENT_CALL;
@@ -229,7 +233,7 @@ bool RDMAConnection::setupConnection(string server, string portnum)
 BAD_CLIENT_CALL:
 BAD_SERVER_CALL:
 
-    rdma_destroy_ep(connectionID);
+    rdma_destroy_ep(tmpID);
 
 BAD_ENDPOINT:
 BAD_ADDRINFO:
@@ -269,4 +273,43 @@ void RDMAConnection::releaseConnection(void)
         sendMR = NULL;
     }
     
+}
+
+int RDMAConnection::receiveMSG(string& msg)
+{
+
+    struct ibv_wc workCompletion;
+
+	int ret = rdma_post_recv(connectionID, NULL, recvMR->addr, 16, recvMR);
+	if (ret != 0)
+        cerr << "Failed to post receive work request." << endl;
+
+    rdma_get_recv_comp(connectionID, &workCompletion);
+
+    if (workCompletion.byte_len > 0) {
+        cout << "Message received: " << (char *)recvMR->addr << endl;
+        bzero(recvMR->addr, recvMR->length);
+    }
+
+    return ret;
+}
+
+int RDMAConnection::sendMSG(string& msg)
+{
+
+    int sFlags = 0;
+
+    struct ibv_wc workCompletion;
+
+    //TODO: Get rid of this copy by reading data directly into the MR
+    memcpy(sendMR->addr, msg.c_str(), sendMR->length);
+
+	int ret = rdma_post_send(connectionID, NULL, sendMR->addr, 16, sendMR, sFlags);
+	if (ret != 0)
+        cerr << "Failed to post send work request." << endl;
+
+    ret = rdma_get_send_comp(connectionID, &workCompletion);
+    cout << "Message sent: " << (char *)sendMR->addr << endl;
+
+    return ret;
 }
