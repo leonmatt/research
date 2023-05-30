@@ -6,10 +6,15 @@ In your development directory go through the following steps:
     The setup script assumes that you have 2 cards placed in the first and second pcie slots of your server
 
 2: Build and Install irdma drivers
+
 wget https://downloadmirror.intel.com/772536/irdma-1.1.11.tar.gz or get the latest irdma driver for your distro/os
+
 tar -xvzf irdma-1.1.11.tar.gz
+
 cd irdma-1.1.11
+
 Meticulously follow the steps in README_irdma.txt
+
 
 3: Reboot your machine
 
