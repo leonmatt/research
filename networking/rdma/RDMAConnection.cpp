@@ -67,9 +67,9 @@ RDMAConnection::~RDMAConnection()
 bool RDMAConnection::setupConnection(string server, string portnum)
 {
 
-	struct rdma_addrinfo hints = {0};
+    struct rdma_addrinfo hints = {0};
     struct rdma_addrinfo* res  = NULL;
-	struct ibv_qp_init_attr attr = {0}, initAttr = {0};
+    struct ibv_qp_init_attr attr = {0}, initAttr = {0};
     struct ibv_qp_attr qpAttr = {};
 
     struct rdma_cm_id *tmpID;
@@ -153,8 +153,6 @@ bool RDMAConnection::setupConnection(string server, string portnum)
             cerr << "Server failed to query the QP." << endl;
             goto BAD_SERVER_CALL;
         }
-
-        cout << "About to set up MRs" << endl;
 
         // Set up receive buffer
         recvMR = rdma_reg_msgs(connectionID, recvBuffer, 16);
@@ -284,8 +282,7 @@ int RDMAConnection::receiveMSG(string& msg)
 	if (ret != 0)
         cerr << "Failed to post receive work request." << endl;
 
-    rdma_get_recv_comp(connectionID, &workCompletion);
-
+    ret = rdma_get_recv_comp(connectionID, &workCompletion);
     if (workCompletion.byte_len > 0) {
         cout << "Message received: " << (char *)recvMR->addr << endl;
         bzero(recvMR->addr, recvMR->length);

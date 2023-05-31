@@ -22,6 +22,10 @@ sudo ip link set dev enp2s0f0 netns net1
 sudo ip netns exec net0 ifconfig enp1s0f0 10.0.1.5
 sudo ip netns exec net1 ifconfig enp2s0f0 10.0.1.6
 
+# Set up routes for each card to each other
+sudo ip netns exec net0 ip route add 10.0.1.6 via 10.0.1.5
+sudo ip netns exec net1 ip route add 10.0.1.5 via 10.0.1.6
+
 # Add both cards to rdma link using soft-iwarp
 sudo ip netns exec net0 rdma link add siwdev1 type siw netdev enp1s0f0
 sudo ip netns exec net1 rdma link add siwdev2 type siw netdev enp2s0f0
