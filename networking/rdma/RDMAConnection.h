@@ -3,8 +3,8 @@ Copyright (C) 2023 Matthew Leon
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef RDMA_CONNECTION
-#define RDMA_CONNECTION
+#ifndef RDMA_CONNECTION_H
+#define RDMA_CONNECTION_H
 
 #include <string>
 
@@ -17,7 +17,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace std;
 
-class RDMAConnection {
+class RDMAConnection
+{
 
 public:
 
