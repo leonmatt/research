@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace std;
 
+// Abstract Vehicle Class
 class Vehicle
 {
 
@@ -23,6 +24,7 @@ private:
 
 };
 
+// Concreate Vehicle Class for short distances
 class Bike : public Vehicle
 {
 
@@ -37,6 +39,7 @@ public:
 
 };
 
+// Concreate Vehicle Class for medium to long distances
 class Car : public Vehicle
 {
 
@@ -50,6 +53,7 @@ public:
 
 };
 
+// Concreate Vehicle Class for long distances
 class Plane : public Vehicle
 {
 
@@ -63,6 +67,7 @@ public:
 
 };
 
+// Function for allocating a concreate Vehicle class
 Vehicle *getVehicle(uint distanceInMiles)
 {
     Vehicle *ret = NULL;
@@ -86,4 +91,4 @@ Vehicle *getVehicle(uint distanceInMiles)
 
 }
 
-#endif //VEHICLE_H
+#endif // VEHICLE_H
