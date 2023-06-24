@@ -8,7 +8,7 @@ using its base class in C++.
 In this example, we have an application that is written in main.cpp. We also have a library of classes implemented in vehicle.h.
 
 In main.cpp, you will see that it only knows that vehicle.h is a library that allows it to allocate a vehicle.
-It is important that it knows about the abstract Vehicle class, but that is it. It does not know about the concrete classes.
+It is important that it knows about the abstract Vehicle class, but that is it. It does not need to know about the concrete classes.
 
 In vehicle.h, you will see that it implements a base vehicle class, a bike, car, and plane class, and a function
 for deciding which class it is going to allocate. 
