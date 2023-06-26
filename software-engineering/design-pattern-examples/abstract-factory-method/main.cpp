@@ -5,6 +5,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "store.h"
 
+
 int main(void)
 {
 
@@ -28,4 +29,4 @@ int main(void)
     delete AS;
     delete FS;
 
-} 
+}
