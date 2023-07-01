@@ -54,6 +54,8 @@ public:
 
     string computerBrand;
 
+    virtual void buildComputer() {}
+
 };
 
 // Concrete Computer Builder Class
@@ -65,7 +67,7 @@ public:
     IntelComputerBuilder() {}
     ~IntelComputerBuilder() {}
 
-    void buildComputer() {
+    void buildComputer() override {
 
         Computer *newComp = new Computer();
 
