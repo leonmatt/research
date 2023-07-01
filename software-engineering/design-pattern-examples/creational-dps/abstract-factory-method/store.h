@@ -27,7 +27,7 @@ private:
 
 };
 
-// Concreate Store Class for furniture
+// Concrete Store Class for furniture
 class FurnitureStore : public Store
 {
 
@@ -65,7 +65,7 @@ public:
 
 };
 
-// Concreate Store Class for appliances
+// Concrete Store Class for appliances
 class ApplianceStore : public Store
 {
 
@@ -104,7 +104,7 @@ public:
 };
 
 
-// Function for allocating a concreate Vehicle class
+// Function for allocating a concrete Vehicle class
 Store *getStore(string typeOfStore)
 {
     Store *ret = NULL;
