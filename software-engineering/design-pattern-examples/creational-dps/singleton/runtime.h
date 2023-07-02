@@ -6,7 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #ifndef RUNTIME_H
 #define RUNTIME_H
 
-// Abstract Connection Class
+// Concrete Runtime Class
+
 class Runtime
 {
 
