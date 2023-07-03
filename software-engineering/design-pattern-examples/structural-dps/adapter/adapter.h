@@ -33,6 +33,7 @@ public:
 
     }
 
+
 };
 
 #endif // TARGETADAPTER_H
