@@ -24,13 +24,14 @@ public:
 
     }
 
+    ~Runtime() {}
+
 private:
 
     static Runtime *currentRuntime;
 
     Runtime()  {}
     Runtime(const Runtime &copy) {}
-    ~Runtime() {}
 
 };
 

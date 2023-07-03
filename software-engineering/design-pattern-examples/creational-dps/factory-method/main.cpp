@@ -1,3 +1,8 @@
+/*
+Copyright (C) 2023 Matthew Leon
+SPDX-License-Identifier: BSD-3-Clause
+*/
+
 # include "vehicle.h"
 
 int main(void)
@@ -16,5 +21,7 @@ int main(void)
     delete VSD;
     delete VMD;
     delete VLD;
+
+    return 0;
 
 }
