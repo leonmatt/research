@@ -15,9 +15,11 @@ int main(void)
         cout << "We got a new PC!" << endl;
     }
 
+    // Release PCs
     delete myNewPC;
-
     delete myIntelCB;
+
+    return 0;
 
 }
 

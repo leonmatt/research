@@ -1,3 +1,8 @@
+/*
+Copyright (C) 2023 Matthew Leon
+SPDX-License-Identifier: BSD-3-Clause
+*/
+
 # include "server.h"
 
 #include <iostream>
@@ -17,10 +22,17 @@ int main(void)
     Connection *serverConn2 = serverConn1->clone();
 
     // Dump the class data
-    cout << "Connection 1 Address: " << &serverConn1 << endl;
-    cout << "Connection 2 Address: " << &serverConn2 << endl;
-    cout << endl << endl << endl;
+    cout << endl;
+    cout << "Connection 1 Address: " << serverConn1 << endl;
+    cout << "Connection 2 Address: " << serverConn2 << endl;
+    cout << endl;
     cout << "Connection 1 Descriptor: " << serverConn1->socketVal << endl;
     cout << "Connection 2 Descriptor: " << serverConn2->socketVal << endl;
+
+    // Release Server Connections
+    delete serverConn1;
+    delete serverConn2;
+
+    return 0;
 
 }
