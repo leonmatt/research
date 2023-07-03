@@ -11,6 +11,23 @@ class Target
 
 public:
 
+    int targetValue;
+
+    Target() {}
+    ~Target() {}
+
+    void setTargetValue(int value)
+    {
+        targetValue = value;
+    }
+
+    int getData()
+    {
+
+        return targetValue;
+
+    }
+
 };
 
 #endif // TARGET_H
