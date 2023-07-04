@@ -1,7 +1,7 @@
 ## The Singleton Pattern
 
 The Singleton Pattern is a Creational Design Pattern that emphasizes maintaining a single instance of a class.
-It is also considered to be an anti-pattern as well because it basically acts as a global variable.
+It is also considered to be an anti-pattern depending on the context as well.
 
 The general idea is that you want to maintain a single point of access to some resource, and the singleton is a way to do that. The singleton has a ton of application when it is used appropriately. For things like logging or caching, it can be a useful tool.
 
