@@ -12,6 +12,7 @@ using namespace std;
 
 int main(void)
 {
+
     // Create the Target
     Target *originalTarget = new Target();
 
