@@ -18,7 +18,7 @@ int main(void)
     myGroup->addDevice(getHardwareDevice("IPU"));
 
     // Build the Hardware Devices
-    myGroup->buildAllDevices();
+    myGroup->build();
 
     // Remove the Hardware Group
     delete myGroup;

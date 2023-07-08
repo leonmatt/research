@@ -108,7 +108,7 @@ public:
     HardwareGroup() {}
     ~HardwareGroup() {}
 
-    void buildAllDevices()
+    void build()
     {
 
         for (shared_ptr<HardwareDevice> i : deviceVector)

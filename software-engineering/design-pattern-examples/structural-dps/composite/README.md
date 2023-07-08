@@ -1,12 +1,12 @@
-## The Bridge Pattern
+## The Composite Pattern
 
-The Bridge Pattern is a Structural Design Pattern that makes abstract interfaces instead of only concrete interfaces.
+The Composite Pattern is a Structural Design Pattern that composes objects into trees in part-whole hierarchies
 
-The general idea is that we want to separate abstractions from implementations, so they are not tightly-coupled.
+The general idea is that by engineering our classes properly, we can treat a single object the same way that we
+treat multiple objects.
 
-In this example, we have a Connection class that supports Network and Database connections. The Network Connection
-supports GRPC and MPI message-passing protocols. The important thing to know is that the Messages are implemented
-as abstractions, and the protocol messaging interfaces are concrete classes, including GRPC and MPI.
+In this example we have a bunch of hardware classes along with an overarching class called HardwareGroup. The HardwareGroup
+contains a vector of hardware devices and you can treat it like its own hardware device.
 
-By passing a concrete messaging interface to the Connection class, we can make sure that our concrete classes are
-not tightly coupled to their abstractions.
+By containing all of these like classes together in a single group, if we need to operate on all of the objects or a subset,
+then we can do that.
