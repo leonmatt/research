@@ -35,6 +35,8 @@ public:
 class SessionHandler
 {
 
+public:
+
     SessionHandler() {}
     ~SessionHandler() {}
     
