@@ -75,7 +75,8 @@ public:
 
         cout << "Error Handler handling Request" << endl;
 
-        nextHandler->handleRequest(request);
+        if (nextHandler)
+            nextHandler->handleRequest(request);
 
     }
 
