@@ -6,21 +6,27 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 #include <iostream>
 
+#include "iterator.h"
+
 using namespace std;
 
 int main(void)
 {
 
-    // Simple vector of integers
-    vector<int> myIntVector;
+    unique_ptr<int[]> myArray(new int[6]);
 
-    // Push some values into the vector
-    for (int i = 0; i < 10; i++)
-        myIntVector.push_back(i);
+    for (int i = 0; i < 6; i++)
+        myArray[i] = i + 1;
 
-    // Dump the values using an iterator
-    for (vector<int>::iterator i = myIntVector.begin(); i != myIntVector.end(); i++)
-        cout << *i << endl;
+    IntegerIterator myIterator(move(myArray));
+
+    for (int i = 0; i < 6; i++) {
+
+        cout << *myIterator << endl;
+
+        myIterator++;
+    
+    }
 
     return 0;
 
