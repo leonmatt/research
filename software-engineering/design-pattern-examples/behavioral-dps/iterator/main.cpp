@@ -18,7 +18,7 @@ int main(void)
     for (int i = 0; i < 6; i++)
         myArray[i] = i + 1;
 
-    IntegerIterator myIterator(move(myArray));
+    Iterator<int> myIterator(move(myArray));
 
     for (int i = 0; i < 6; i++) {
 

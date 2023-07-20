@@ -10,32 +10,34 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace std;
 
-class IntegerIterator
+template <typename T>
+
+class Iterator
 {
 
 public:
 
-    unique_ptr<int[]> currentInteger;
+    unique_ptr<T[]> currentCollection;
 
     int currentPosition;
 
-    IntegerIterator(unique_ptr<int[]> integer)
+    Iterator(unique_ptr<T[]> integer)
     {
 
-        currentInteger = move(integer);
+        currentCollection = move(integer);
 
         currentPosition = 0;
 
     }
 
-    IntegerIterator(const IntegerIterator& other){}
+    Iterator(const Iterator& other){}
 
-    ~IntegerIterator() {}
+    ~Iterator() {}
 
-    IntegerIterator operator++(int)
+    Iterator operator++(int)
     {
 
-        IntegerIterator temp = *this;
+        Iterator temp = *this;
 
         currentPosition++;
 
@@ -43,10 +45,10 @@ public:
 
     }
 
-    IntegerIterator operator--(int)
+    Iterator operator--(int)
     {
 
-        IntegerIterator temp = *this;
+        Iterator temp = *this;
 
         currentPosition--;
 
@@ -57,9 +59,10 @@ public:
     int operator*()
     {
 
-        return currentInteger[currentPosition];
+        return currentCollection[currentPosition];
 
     }
+
 
 };
 
