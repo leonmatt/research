@@ -4,10 +4,11 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include <memory>
+#include <string>
+
+#include "tsmediator.h"
 
 using namespace std;
-
-class TSMediator;
 
 #ifndef TRADINGENGINE_H
 #define TRADINGENGINE_H
@@ -21,6 +22,20 @@ public:
 
     TradingEngine() {}
     ~TradingEngine() {}
+
+    void setMediator(shared_ptr<TSMediator> m)
+    {
+
+        mediator = m;
+
+    }
+
+    void process(string Ticker, int numShares, bool shouldBuy)
+    {
+
+        mediator->submitOrder(Ticker, numShares, shouldBuy);
+
+    }
 
 };
 
