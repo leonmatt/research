@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <algorithm>
 
-#include "RDMAConnection.h"
+#include "rdmaserver.h"
 
 using namespace std;
 
@@ -24,7 +24,9 @@ int main(int argc, char *argv[], char *env[])
 
     // Allocate the infiniband connection
     cout << "Setting up connection for device: " << vars[1] << endl;
-    RDMAConnection rdmaServer(vars[1]);
+
+    // Set up RDMAServer
+    RDMAServer rdmaServer(vars[1]);
 
     // Set up the infiniband connection
     rdmaServer.setupConnection("0.0.0.0", vars[3]);
