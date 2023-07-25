@@ -15,6 +15,7 @@ sudo ip link set enp2s0f0 up
 # Create and each network card to namespace
 sudo ip netns add net0
 sudo ip netns add net1
+
 sudo ip link set dev enp1s0f0 netns net0
 sudo ip link set dev enp2s0f0 netns net1
 

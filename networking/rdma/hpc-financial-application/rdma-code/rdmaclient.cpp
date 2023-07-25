@@ -58,6 +58,8 @@ bool RDMAClient::setupConnection(string server, string portnum)
 
     struct rdma_conn_param connectionParams = {0};
 
+    struct ibv_wc workCompletion;
+
 	int ret = -1;
 
     uint8_t *recvBuffer = NULL, *sendBuffer = NULL;
@@ -85,6 +87,7 @@ bool RDMAClient::setupConnection(string server, string portnum)
     }
 
     // Set the communication line details
+    memset(&attr, 0, sizeof attr);
     attr.cap.max_send_wr = 1;
 	attr.cap.max_recv_wr = 1;
 	attr.cap.max_send_sge = 1;
@@ -100,7 +103,6 @@ bool RDMAClient::setupConnection(string server, string portnum)
         goto BAD_ENDPOINT;
     }
     
-
     connectionID = tmpID;
 
     // Set up receive buffer
@@ -120,7 +122,7 @@ bool RDMAClient::setupConnection(string server, string portnum)
     }
 
     // Receive connection request response
-    ret = rdma_post_recv(connectionID, NULL, recvBuffer, recvMR->length, recvMR);
+    ret = rdma_post_recv(connectionID, NULL, recvBuffer, 16, recvMR);
     if (ret) {
         cerr << "Client failed to post receive work request." << endl;
         goto BAD_CLIENT_CALL;
@@ -132,6 +134,24 @@ bool RDMAClient::setupConnection(string server, string portnum)
         cerr << "Client failed to connect." << endl;
         goto BAD_CLIENT_CALL;
     }
+
+	ret = rdma_post_send(connectionID, NULL, sendBuffer, 16, sendMR, IBV_SEND_INLINE);
+	if (ret) {
+		perror("rdma_post_send");
+	}
+
+    while ((ret = rdma_get_send_comp(connectionID, &workCompletion)) == 0){}
+	if (ret < 0) {
+		perror("rdma_get_send_comp");
+	}
+
+	while ((ret = rdma_get_recv_comp(connectionID, &workCompletion)) == 0) {}
+	if (ret < 0)
+		perror("rdma_get_recv_comp");
+	else
+		ret = 0;
+
+    cout << recvBuffer << endl;
 
     cout << "Client has connected to the server" << endl << flush;
 
@@ -188,17 +208,18 @@ int RDMAClient::receiveMSG(string& msg)
 
     struct ibv_wc workCompletion;
 
-	int ret = rdma_post_recv(connectionID, NULL, recvMR->addr, 16, recvMR);
+	int ret = rdma_post_recv(connectionID, NULL, (void *)&msg[0], 16, recvMR);
 	if (ret != 0)
         cerr << "Failed to post receive work request." << endl;
 
-    ret = rdma_get_recv_comp(connectionID, &workCompletion);
+    while((ret = rdma_get_recv_comp(connectionID, &workCompletion)) == 0);
     if (workCompletion.byte_len > 0) {
-        cout << "Message received: " << (char *)recvMR->addr << endl;
+        cout << "Message received: " << msg << endl;
         bzero(recvMR->addr, recvMR->length);
     }
 
     return ret;
+
 }
 
 int RDMAClient::sendMSG(string msg)
@@ -209,14 +230,16 @@ int RDMAClient::sendMSG(string msg)
     struct ibv_wc workCompletion;
 
     //TODO: Get rid of this copy by reading data directly into the MR
-    memcpy(sendMR->addr, msg.c_str(), sendMR->length);
+    //memcpy(sendMR->addr, msg.c_str(), sendMR->length);
 
-	int ret = rdma_post_send(connectionID, NULL, sendMR->addr, 16, sendMR, sFlags);
-	if (ret != 0)
-        cerr << "Failed to post send work request." << endl;
+    int ret = rdma_post_send(connectionID, NULL, (void *)msg.c_str(), 16, sendMR, sFlags);
+    if (ret != 0) {
+        cerr << "Failed to post send work request: " << errno << endl;
+    }
 
-    ret = rdma_get_send_comp(connectionID, &workCompletion);
-    cout << "Message sent: " << (char *)sendMR->addr << endl;
+	while ((ret = rdma_get_send_comp(connectionID, &workCompletion)) == 0);
+    cout << "Message sent: " << msg << endl;
 
     return ret;
+
 }

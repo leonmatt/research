@@ -20,6 +20,10 @@ int main(int argc, char *argv[], char *env[])
     string fname = "config.txt";
     string vars[4];
 
+    string msg = "";
+
+    string& msgRef = msg;
+
     parseConfiguration(fname, vars);
 
     // Allocate the infiniband connection
@@ -31,12 +35,9 @@ int main(int argc, char *argv[], char *env[])
     // Set up the infiniband connection
     rdmaServer.setupConnection("0.0.0.0", vars[3]);
 
-    string msg = "";
-
-    string& msgRef = msg;
-
-    while (true)
+    while (true) {
         rdmaServer.receiveMSG(msgRef);
+    }
 
     return 0;
 
