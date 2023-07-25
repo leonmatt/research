@@ -211,6 +211,12 @@ int RDMAServer::receiveMSG(string& msg)
 
     struct ibv_wc workCompletion;
 
+
+
+
+
+    // RDMA_CORE -> PROVIDERS -> IRDMA -> UVERBS.C -> irdma_upost_recv
+
 	int ret = rdma_post_recv(connectionID, NULL, recvMR->addr, 16, recvMR);
 	if (ret != 0)
         cerr << "Failed to post receive work request." << strerror(errno) << endl;
