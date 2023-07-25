@@ -24,6 +24,8 @@ int main(int argc, char *argv[], char *env[])
 
     // Allocate the infiniband connection
     cout << "Setting up connection for device: " << vars[1] << endl;
+
+    // Set up RDMAServer
     RDMAServer rdmaServer(vars[1]);
 
     // Set up the infiniband connection

@@ -18,6 +18,7 @@ int main(int argc, char *argv[], char *env[])
 {
 
     string fname = "config.txt";
+
     string vars[5];
 
     parseConfiguration(fname, vars);
