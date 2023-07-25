@@ -3,9 +3,6 @@ Copyright (C) 2023 Matthew Leon
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef RDMA_CONNECTION_H
-#define RDMA_CONNECTION_H
-
 #include <string>
 
 #include <iostream>
@@ -17,21 +14,35 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace std;
 
-class RDMAConnection
+#ifndef RDMACLIENT_H
+#define RDMACLIENT_H
+
+class RDMAClient
 {
 
 public:
 
     string devName;
 
-    RDMAConnection(string&);
-    ~RDMAConnection();
+    RDMAClient(string deviceName)
+    {
+
+        devName = deviceName;
+
+    }
+    ~RDMAClient() 
+    {
+
+        releaseConnection();
+
+    }
 
     bool setupConnection(string, string);
-    void releaseConnection(void);
+    bool releaseConnection();
 
-    int receiveMSG(string&);
-    int sendMSG(string&);
+    int receiveMSG(string& msg);
+    int sendMSG(string msg);
+
 
 private:
 
@@ -48,4 +59,5 @@ private:
 };
 
 
-#endif
+
+#endif // RDMACLIENT_H

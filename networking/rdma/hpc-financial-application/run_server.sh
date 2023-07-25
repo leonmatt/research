@@ -6,7 +6,7 @@
 #
 
 # Compile the code
-make
+cd rdma-code && make server && cd ..
 
 # Run the server in the network ns
-sudo ip netns exec net1 ./server config.txt
+sudo ip netns exec net1 gdb ./bin/rdma_server config.txt

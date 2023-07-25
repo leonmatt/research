@@ -6,7 +6,7 @@
 #
 
 # Compile the code
-make
+cd rdma-code && make client && cd ..
 
 # Run the server in the network ns
-sudo ip netns exec net0 ./client config.txt
+sudo ip netns exec net0 ./bin/rdma_client config.txt
