@@ -5,14 +5,15 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 #include <string>
-#include <fstream>
 #include <algorithm>
+#include <filesystem>
 
 #include "rdmaclient.h"
 
 using namespace std;
 
-void parseConfiguration(const string& configName, string (&vars)[5]);
+void parseConfiguration(const string& configName, string vars[]);
+
 
 int main(int argc, char *argv[], char *env[])
 {
@@ -20,6 +21,9 @@ int main(int argc, char *argv[], char *env[])
     string fname = "config.txt";
 
     string vars[5];
+
+    string dataLine;
+    dataLine.resize(16);
 
     parseConfiguration(fname, vars);
 
@@ -30,22 +34,13 @@ int main(int argc, char *argv[], char *env[])
     // Set up the infiniband connection
     rdmaClient.setupConnection(vars[2], vars[3]);
 
-    ifstream dataFile(vars[5]);
-
-    ios_base::sync_with_stdio(false);
-
-    string dataLine;
-    dataLine.resize(1000);
-
-    if (dataFile.is_open())
-        while (dataFile.read(&dataLine[0], 1000))
-            rdmaClient.sendMSG(dataLine);
+    rdmaClient.sendData(vars[4].c_str());
 
     return 0;
 
 }
 
-void parseConfiguration(const string& configName, string (&vars)[5])
+void parseConfiguration(const string& configName, string vars[])
 {
     ifstream configFile;
     string delim = "=";
@@ -54,8 +49,6 @@ void parseConfiguration(const string& configName, string (&vars)[5])
     if (configFile.is_open()) {
     
         while (getline(configFile, line)) {
-
-            cout << line << endl;
 
             if (line.compare("") == 0)
                 continue;
@@ -73,7 +66,7 @@ void parseConfiguration(const string& configName, string (&vars)[5])
             if(key.compare("server_port") == 0)
                 vars[3] = value;
             if(key.compare("data_file") == 0)
-                vars[4] = value;
+                vars[4] = value.substr(1, value.length()-2);
 
         }
 
