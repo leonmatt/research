@@ -53,8 +53,6 @@ public:
     int receiveMSG(string& msg);
     int sendData(string fname);
 
-    int receiveMSG(string& msg);
-    int sendData(string fname);
 
 private:
 
