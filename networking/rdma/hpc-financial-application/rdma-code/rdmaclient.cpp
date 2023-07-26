@@ -68,7 +68,7 @@ bool RDMAClient::setupConnection(string server, string portnum)
 
     struct rdma_conn_param connectionParams = {0};
 
-    int ret = -1;
+	int ret = -1;
 
     // Set up the type of connection
     hints.ai_port_space = RDMA_PS_TCP;
@@ -83,10 +83,10 @@ bool RDMAClient::setupConnection(string server, string portnum)
     // Set the communication line details
     memset(&attr, 0, sizeof attr);
     attr.cap.max_send_wr = 1;
-	  attr.cap.max_recv_wr = 1;
-	  attr.cap.max_send_sge = 1;
-	 attr.cap.max_recv_sge = 1;
-	  attr.cap.max_inline_data = 16;
+	attr.cap.max_recv_wr = 1;
+	attr.cap.max_send_sge = 1;
+	attr.cap.max_recv_sge = 1;
+	attr.cap.max_inline_data = 16;
     attr.sq_sig_all = 1;
     attr.qp_context = tmpID;
 
@@ -151,7 +151,6 @@ bool RDMAClient::setupConnection(string server, string portnum)
 
     cout << recvBuffer << endl;
     */
-
     cout << "Client has connected to the server" << endl << flush;
 
     goto SUCCESS;
