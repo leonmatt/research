@@ -53,6 +53,7 @@ public:
     int receiveMSG(string& msg);
     int sendData(string fname);
 
+
 private:
 
     // The communication socket
