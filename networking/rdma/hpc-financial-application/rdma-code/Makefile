@@ -11,9 +11,9 @@ clean:
 client: client.cpp
 	$(CPP) $(CFLAGS) -o rdma_client client.cpp rdmaclient.cpp $(VFLAGS)
 	mkdir -p ../bin
-	cp rdma_client ../bin/
+	mv rdma_client ../bin/
 
 server: server.cpp
 	$(CPP) $(CFLAGS) -o rdma_server server.cpp rdmaserver.cpp $(VFLAGS)
 	mkdir -p ../bin
-	cp rdma_server ../bin/
+	mv rdma_server ../bin/

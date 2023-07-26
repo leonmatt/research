@@ -22,7 +22,11 @@ int main(int argc, char *argv[], char *env[])
 
     string msg = "";
 
-    string& msgRef = msg;
+    //string& msgRef = msg;
+
+    struct ibv_wc workCompletion;
+
+    int ret = 0;
 
     parseConfiguration(fname, vars);
 
@@ -32,12 +36,14 @@ int main(int argc, char *argv[], char *env[])
     // Set up RDMAServer
     RDMAServer rdmaServer(vars[1]);
 
-    // Set up the infiniband connection
+    // Set up the rdma connection
     rdmaServer.setupConnection("0.0.0.0", vars[3]);
 
-    while (true) {
-        rdmaServer.receiveMSG(msgRef);
-    }
+    // Wait for client to connect
+    while((ret = rdma_get_recv_comp(rdmaServer.getConnectionID(), &workCompletion)) == 0) {}
+
+    // Start the data transfer
+    rdmaServer.receiveData();
 
     return 0;
 

@@ -5,7 +5,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <string>
 
+#include <fstream>
 #include <iostream>
+
+#include <memory>
+#include <vector>
 
 #include <netdb.h>
 
@@ -24,6 +28,10 @@ public:
 
     string devName;
 
+    // The memory regions for data communications
+    vector<shared_ptr<struct ibv_mr>> recvMRs;
+    vector<shared_ptr<struct ibv_mr>> sendMRs;
+
     RDMAClient(string deviceName)
     {
 
@@ -41,17 +49,13 @@ public:
     bool releaseConnection();
 
     int receiveMSG(string& msg);
-    int sendMSG(string msg);
+    int sendData(string fname);
 
 
 private:
 
     // The communication socket
     struct rdma_cm_id *connectionID = NULL;
-
-    // The receive and send buffers
-    struct ibv_mr* recvMR = NULL;
-    struct ibv_mr* sendMR = NULL;
 
     // The IP that we connected to or binded to
     string connectionIP;

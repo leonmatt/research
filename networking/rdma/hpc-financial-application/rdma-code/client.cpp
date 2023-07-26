@@ -5,7 +5,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 #include <string>
-#include <fstream>
 #include <algorithm>
 #include <filesystem>
 
@@ -34,15 +33,7 @@ int main(int argc, char *argv[], char *env[])
     // Set up the infiniband connection
     rdmaClient.setupConnection(vars[2], vars[3]);
 
-    ifstream dataFile(vars[4].c_str());
-    if (!dataFile) {
-        cerr << "Failed to open file: " << strerror(errno) << endl;
-    }
-
-    while (dataFile.read(&dataLine[0], 16) || dataFile.gcount()) {
-        std::cout.write(&dataLine[0], dataFile.gcount());
-        rdmaClient.sendMSG(dataLine);
-    }
+    rdmaClient.sendData(vars[4].c_str());
     
     return 0;
 
