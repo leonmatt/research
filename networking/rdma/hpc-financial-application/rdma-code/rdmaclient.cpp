@@ -51,6 +51,13 @@ struct rdma_addrinfo* clearAddrInfo(struct rdma_addrinfo* res)
 
 }
 
+struct rdma_cm_id * RDMAClient::getConnectionID()
+{
+
+    return connectionID;
+
+}
+
 bool RDMAClient::setupConnection(string server, string portnum)
 {
 
@@ -61,11 +68,7 @@ bool RDMAClient::setupConnection(string server, string portnum)
 
     struct rdma_conn_param connectionParams = {0};
 
-    //struct ibv_wc workCompletion;
-
 	int ret = -1;
-
-    uint8_t *recvBuffer = NULL, *sendBuffer = NULL;
 
     // Set up the type of connection
     hints.ai_port_space = RDMA_PS_TCP;
@@ -159,15 +162,6 @@ BAD_CLIENT_CALL:
 BAD_ENDPOINT:
 BAD_ADDRINFO:
 
-    delete sendBuffer;
-    sendBuffer = NULL;
-
-BAD_SEND_BUFFER:
-
-    delete recvBuffer;
-    recvBuffer = NULL;
-
-BAD_RECV_BUFFER:
 SUCCESS:
     
     res = clearAddrInfo(res);
@@ -223,7 +217,11 @@ int RDMAClient::receiveMSG(string& msg)
 int RDMAClient::sendData(string fname)
 {
 
-    ifstream dataFile(fname);
+    struct ibv_wc workCompletion;
+
+    string dataLine;
+
+    ifstream dataFile(fname, ios::binary | ios::in);
     if (!dataFile) {
         cerr << "Failed to open file: " << strerror(errno) << endl;
     }
@@ -236,10 +234,23 @@ int RDMAClient::sendData(string fname)
 
     memcpy(sendBuffers[0], to_string(fsize).c_str(), 16);
 
+    // Send the number of bytes that will be sent over
     int ret = rdma_post_send(connectionID, NULL, sendBuffers[0], 16, sendMRs[0].get(), IBV_SEND_INLINE);
     if (ret != 0) {
         cerr << "Failed to post send work request: " << errno << endl;
     }
+
+    // Wait for acknowledgement
+    while((ret = rdma_get_recv_comp(connectionID, &workCompletion)) == 0) {}
+
+    for (int i = 0; i < 100; i++) {
+        dataFile.read((char*)&sendBuffers[i][0], 16);
+        rdma_post_send(connectionID, NULL, sendBuffers[i], 16, sendMRs[i].get(), IBV_SEND_INLINE);
+    }
+
+    // Dump the data
+    cout << "DATA SENT: " << endl;
+    cout << (char *)sendBuffers[0];
 
     /*int sFlags = 0;
 

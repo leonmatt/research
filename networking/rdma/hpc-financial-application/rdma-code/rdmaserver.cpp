@@ -91,8 +91,8 @@ bool RDMAServer::setupConnection(string server, string portnum)
     }
 
     // Set the communication line details
-    attr.cap.max_send_wr = 1;
-    attr.cap.max_recv_wr = 1;
+    attr.cap.max_send_wr = 100;
+    attr.cap.max_recv_wr = 100;
     attr.cap.max_send_sge = 1;
     attr.cap.max_recv_sge = 1;
     attr.cap.max_inline_data = 16;
@@ -217,36 +217,38 @@ int RDMAServer::receiveData()
 
     int ret = 0;
 
-    //struct ibv_wc workCompletion;
+    struct ibv_wc workCompletion;
 
-    //int numBytes = 0;
-    //int numReqs = 0;
-    
-    //numBytes = stoi((char*)(recvBuffers[0]));
-    
-    //numReqs = numBytes / 16 + 1;
-    cout << "Number of bytes to receive: " << recvBuffers[0] << endl;
-
-    //cout << "Number of bytes to receive: " << numBytes << endl;
-    //cout << "Number of reqs to post: " << numReqs << endl;
+    int numBytes = stoi((char*)(recvBuffers[0]));
+    int numReqs = numBytes / 16 + 1;
+        
+    cout << "Number of bytes to receive: " << numBytes << endl;
+    cout << "Number of reqs to post: " << numReqs << endl;
 
     // Post 10 receives because we need to have them ready for hft data
-    /*for (int i = 0; i < 10; i++) {
-    	int ret = rdma_post_recv(connectionID, NULL, recvBuffer, 16, recvMR);
+    for (int i = 0; i < 100; i++) {
+    	int ret = rdma_post_recv(connectionID, NULL, recvBuffers[i], 16, recvMRs[i].get());
 	    if (ret != 0) 
             cerr << "Failed to post receive work request." << strerror(errno) << endl;
     }
 
+    // Post a send to start the transfer
+    ret = rdma_post_send(connectionID, NULL, sendBuffers[0], 16, sendMRs[0].get(), IBV_SEND_INLINE);
+    if (ret != 0) {
+        cerr << "Failed to post send work request: " << errno << endl;
+    }
 
+    // Receive the data
+    for (int i = 0; i < 100; i++)
+        while((ret = rdma_get_recv_comp(connectionID, &workCompletion)) == 0) {}
 
-    while((ret = rdma_get_recv_comp(connectionID, &workCompletion)) == 0);
-    
-    cout << "Message received: " << recvBuffer << endl;
-    */
-    //msg = (char *)recvBuffer;
+    // Dump the data
+    cout << "DATA RECEIVED: " << endl;
+    cout << (char *)recvBuffers[0];
+
+    cout << endl;
 
     return ret;
-
 }
 
 int RDMAServer::sendMSG(string msg)

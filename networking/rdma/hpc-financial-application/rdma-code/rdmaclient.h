@@ -48,6 +48,8 @@ public:
     bool setupConnection(string, string);
     bool releaseConnection();
 
+    struct rdma_cm_id *getConnectionID();
+
     int receiveMSG(string& msg);
     int sendData(string fname);
 
