@@ -60,7 +60,6 @@ struct rdma_cm_id * RDMAServer::getConnectionID()
 
 }
 
-
 bool RDMAServer::setupConnection(string server, string portnum)
 {
 
@@ -140,6 +139,7 @@ bool RDMAServer::setupConnection(string server, string portnum)
         cerr << "Server failed to register send buffer";
         goto BAD_SERVER_CALL;
     }*/
+
     for (int i = 0; i < 100; i++) {
         sendMRs.push_back(make_shared<struct ibv_mr>(*rdma_reg_msgs(connectionID, sendBuffers[i], 16)));
     }
@@ -178,6 +178,7 @@ BAD_SERVER_CALL:
 
 BAD_ENDPOINT:
 BAD_ADDRINFO:
+
 SUCCESS:
     
     res = clearAddrInfo(res);
