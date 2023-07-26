@@ -14,6 +14,7 @@ using namespace std;
 
 void parseConfiguration(const string& configName, string vars[]);
 
+
 int main(int argc, char *argv[], char *env[])
 {
 
@@ -34,7 +35,7 @@ int main(int argc, char *argv[], char *env[])
     rdmaClient.setupConnection(vars[2], vars[3]);
 
     rdmaClient.sendData(vars[4].c_str());
-    
+
     return 0;
 
 }

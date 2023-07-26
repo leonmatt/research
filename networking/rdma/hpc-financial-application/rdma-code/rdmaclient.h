@@ -53,7 +53,6 @@ public:
     int receiveMSG(string& msg);
     int sendData(string fname);
 
-
 private:
 
     // The communication socket
@@ -63,7 +62,5 @@ private:
     string connectionIP;
 
 };
-
-
 
 #endif // RDMACLIENT_H
