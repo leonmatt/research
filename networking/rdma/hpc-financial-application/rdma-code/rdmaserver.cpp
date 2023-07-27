@@ -5,6 +5,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <infiniband/verbs.h>
 
+#include <chrono>
+
 #include "rdmaserver.h"
 
 static uint8_t recvBuffers[100][16];
@@ -194,17 +196,6 @@ bool RDMAServer::releaseConnection(void)
 
     connectionIP = "";
 
-    /*if (recvMR != NULL) {
-       ibv_dereg_mr(recvMR);
-        recvMR = NULL;
-    }
-
-    if (sendMR != NULL) {
-       ibv_dereg_mr(sendMR);
-        sendMR = NULL;
-    }
-    */
-
    recvMRs.clear();
    sendMRs.clear();
 
@@ -225,13 +216,9 @@ int RDMAServer::receiveData()
     cout << "Number of bytes to receive: " << numBytes << endl;
     cout << "Number of reqs to post: " << numReqs << endl;
 
-    // Post 10 receives because we need to have them ready for hft data
-    //for (int i = 0; i < 10; i++, numReqs--) {
-    //	ret = rdma_post_recv(connectionID, NULL, recvBuffers[i], 16, recvMRs[i].get());
-	    //if (ret != 0) 
-        //    cerr << "Failed to post receive work request." << strerror(errno) << endl;
-    //}
     ret = rdma_post_recv(connectionID, NULL, recvBuffers[0], 16, recvMRs[0].get());
+
+    auto start = chrono::high_resolution_clock::now();
 
     // Post a send to start the transfer
     ret = rdma_post_send(connectionID, NULL, sendBuffers[0], 16, sendMRs[0].get(), IBV_SEND_INLINE);
@@ -255,11 +242,17 @@ int RDMAServer::receiveData()
 
     }
 
+    auto stop = chrono::high_resolution_clock::now();
+
+    auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+
     recvBuffers[i][0] = 0;
 
     // Dump the data
     cout << "FINAL DATA RECEIVED: " << endl;
     cout << (char *)recvBuffers[0];
+
+    cout << endl << endl << "Time spent transmitting: " << duration.count() << " microseconds" << endl;
 
     cout << endl << endl << endl << "RDMA Reception Complete" << endl;
 
