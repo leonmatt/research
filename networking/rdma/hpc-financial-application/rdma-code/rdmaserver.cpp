@@ -226,11 +226,12 @@ int RDMAServer::receiveData()
     cout << "Number of reqs to post: " << numReqs << endl;
 
     // Post 10 receives because we need to have them ready for hft data
-    for (int i = 0; i < 100; i++) {
-    	int ret = rdma_post_recv(connectionID, NULL, recvBuffers[i], 16, recvMRs[i].get());
-	    if (ret != 0) 
-            cerr << "Failed to post receive work request." << strerror(errno) << endl;
-    }
+    //for (int i = 0; i < 10; i++, numReqs--) {
+    //	ret = rdma_post_recv(connectionID, NULL, recvBuffers[i], 16, recvMRs[i].get());
+	    //if (ret != 0) 
+        //    cerr << "Failed to post receive work request." << strerror(errno) << endl;
+    //}
+    ret = rdma_post_recv(connectionID, NULL, recvBuffers[0], 16, recvMRs[0].get());
 
     // Post a send to start the transfer
     ret = rdma_post_send(connectionID, NULL, sendBuffers[0], 16, sendMRs[0].get(), IBV_SEND_INLINE);
@@ -238,37 +239,37 @@ int RDMAServer::receiveData()
         cerr << "Failed to post send work request: " << errno << endl;
     }
 
+    //We need to know the last sendBuffer that we put data in
+    int i = 0;
+
     // Receive the data
-    for (int i = 0; i < 100; i++)
+    for (i = 0; i < 100 && numReqs > 0; ++i, --numReqs) {
+    	ret = rdma_post_recv(connectionID, NULL, recvBuffers[i], 16, recvMRs[i].get());
         while((ret = rdma_get_recv_comp(connectionID, &workCompletion)) == 0) {}
 
+        ret = rdma_post_send(connectionID, NULL, sendBuffers[0], 16, sendMRs[0].get(), IBV_SEND_INLINE);
+
+        if (i == 99) {
+            i = -1;
+        }
+
+    }
+
+    recvBuffers[i][0] = 0;
+
     // Dump the data
-    cout << "DATA RECEIVED: " << endl;
+    cout << "FINAL DATA RECEIVED: " << endl;
     cout << (char *)recvBuffers[0];
 
-    cout << endl;
+    cout << endl << endl << endl << "RDMA Reception Complete" << endl;
 
-    return ret;
+    return 0;
+
 }
 
 int RDMAServer::sendMSG(string msg)
 {
 
-    //int sFlags = 0;
-
-    //struct ibv_wc workCompletion;
-
-    //TODO: Get rid of this copy by reading data directly into the MR
-    /*memcpy(sendBuffer, msg.c_str(), msg.length());
-
-    int ret = rdma_post_send(connectionID, NULL, sendBuffer, 16, sendMR, sFlags);
-    if (ret != 0) {
-        cerr << "Failed to post send work request: " << errno << endl;
-    }
-
-	while ((ret = rdma_get_send_comp(connectionID, &workCompletion)) == 0);
-    cout << "Message sent: " << msg << endl;
-*/
     return 0;
 
 }

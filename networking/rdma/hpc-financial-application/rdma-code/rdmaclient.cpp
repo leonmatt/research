@@ -198,18 +198,6 @@ bool RDMAClient::releaseConnection()
 int RDMAClient::receiveMSG(string& msg)
 {
 
-    /*struct ibv_wc workCompletion;
-
-	int ret = rdma_post_recv(connectionID, NULL, (void *)&msg[0], 16, recvMR);
-	if (ret != 0)
-        cerr << "Failed to post receive work request." << endl;
-
-    while((ret = rdma_get_recv_comp(connectionID, &workCompletion)) == 0);
-    if (workCompletion.byte_len > 0) {
-        cout << "Message received: " << msg << endl;
-        bzero(recvMR->addr, recvMR->length);
-    }*/
-
     return 0;
 
 }
@@ -232,6 +220,8 @@ int RDMAClient::sendData(string fname)
 
     dataFile.seekg(0, dataFile.beg);
 
+    int numReqs = fsize / 16 + 1;
+
     memcpy(sendBuffers[0], to_string(fsize).c_str(), 16);
 
     // Send the number of bytes that will be sent over
@@ -243,36 +233,31 @@ int RDMAClient::sendData(string fname)
     // Wait for acknowledgement
     while((ret = rdma_get_recv_comp(connectionID, &workCompletion)) == 0) {}
 
-    for (int i = 0; i < 100; i++) {
+    //We need to know the last sendBuffer that we put data in
+    int i = 0;
+
+    for (i = 0; i < 100 && numReqs > 0; ++i, --numReqs) {
         dataFile.read((char*)&sendBuffers[i][0], 16);
+    	ret = rdma_post_recv(connectionID, NULL, recvBuffers[i], 16, recvMRs[i].get());
         rdma_post_send(connectionID, NULL, sendBuffers[i], 16, sendMRs[i].get(), IBV_SEND_INLINE);
+
+        while((ret = rdma_get_recv_comp(connectionID, &workCompletion)) == 0) {}
+
+
+        if (i == 99) {
+            //cout << (char *)sendBuffers[0];
+            i = -1;
+        }
+
     }
+
+    sendBuffers[i][0] = 0;
 
     // Dump the data
-    cout << "DATA SENT: " << endl;
+    cout << "FINAL DATA SENT: " << endl;
     cout << (char *)sendBuffers[0];
 
-    /*int sFlags = 0;
-
-    struct ibv_wc workCompletion;
-
-    //TODO: Get rid of this copy by reading data directly into the MR
-    //memcpy(sendMR->addr, msg.c_str(), sendMR->length);
-
-    int ret = rdma_post_send(connectionID, NULL, (void *)msg.c_str(), 16, sendMR, sFlags);
-    if (ret != 0) {
-        cerr << "Failed to post send work request: " << errno << endl;
-    }
-
-	while ((ret = rdma_get_send_comp(connectionID, &workCompletion)) == 0);
-    cout << "Message sent: " << msg << endl;
-    */
-
-   /*
-       while (dataFile.read(&dataLine[0], 16) || dataFile.gcount()) {
-        std::cout.write(&dataLine[0], dataFile.gcount());
-        rdmaClient.sendData();
-    }*/
+    cout << endl << endl << endl << "RDMA Transfer Complete" << endl;
 
     return 0;
 
