@@ -39,7 +39,7 @@ int main(int argc, char *argv[], char *env[])
     // Set up the rdma connection
     rdmaServer.setupConnection("0.0.0.0", vars[3]);
 
-    // Wait for client to connect
+    // Wait for client to tell us how many bytes they are going to send
     while((ret = rdma_get_recv_comp(rdmaServer.getConnectionID(), &workCompletion)) == 0) {}
 
     // Start the data transfer
