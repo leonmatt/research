@@ -106,13 +106,6 @@ bool RDMAClient::setupConnection(string server, string portnum)
 
     cout << "Populated receive memory regions" << endl;
 
-    // Set up send buffer
-    /*sendMR = rdma_reg_msgs(connectionID, sendBuffer, 16);
-    if (sendMR == NULL) {
-        ret = -1;
-        cerr << "Server failed to register send buffer";
-        goto BAD_SERVER_CALL;
-    }*/
     for (int i = 0; i < 100; i++) {
         sendMRs.push_back(make_shared<struct ibv_mr>(*rdma_reg_msgs(connectionID, sendBuffers[i], 16)));
     }
@@ -133,24 +126,6 @@ bool RDMAClient::setupConnection(string server, string portnum)
         goto BAD_CLIENT_CALL;
     }
 
-	/*ret = rdma_post_send(connectionID, NULL, sendBuffer, 16, sendMR, IBV_SEND_INLINE);
-	if (ret) {
-		perror("rdma_post_send");
-	}
-
-    while ((ret = rdma_get_send_comp(connectionID, &workCompletion)) == 0){}
-	if (ret < 0) {
-		perror("rdma_get_send_comp");
-	}
-
-	while ((ret = rdma_get_recv_comp(connectionID, &workCompletion)) == 0) {}
-	if (ret < 0)
-		perror("rdma_get_recv_comp");
-	else
-		ret = 0;
-
-    cout << recvBuffer << endl;
-    */
     cout << "Client has connected to the server" << endl << flush;
 
     goto SUCCESS;
@@ -245,7 +220,6 @@ int RDMAClient::sendData(string fname)
 
 
         if (i == 99) {
-            //cout << (char *)sendBuffers[0];
             i = -1;
         }
 

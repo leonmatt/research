@@ -20,10 +20,6 @@ int main(int argc, char *argv[], char *env[])
     string fname = "config.txt";
     string vars[4];
 
-    string msg = "";
-
-    //string& msgRef = msg;
-
     struct ibv_wc workCompletion;
 
     int ret = 0;
