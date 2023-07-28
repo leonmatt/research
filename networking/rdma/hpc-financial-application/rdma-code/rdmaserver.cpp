@@ -253,7 +253,6 @@ int RDMAServer::receiveData()
     cout << (char *)recvBuffers[0];
 
     cout << endl << endl << "Time spent transmitting: " << duration.count() << " microseconds" << endl;
-
     cout << endl << endl << endl << "RDMA Reception Complete" << endl;
 
     return 0;
