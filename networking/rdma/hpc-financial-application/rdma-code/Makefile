@@ -5,8 +5,7 @@ VFLAGS = -lrdmacm -libverbs
 all: client server
 
 clean:
-	rm rdma_client
-	rm rdma_server
+	rm -rf bin
 
 client: client.cpp
 	$(CPP) $(CFLAGS) -o rdma_client client.cpp rdmaclient.cpp $(VFLAGS)
