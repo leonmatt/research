@@ -130,7 +130,7 @@ bool RDMAServer::setupConnection(string server, string portnum)
 
     // Set up receive buffers
     for (int i = 0; i < 100; i++) {
-        recvMRs.push_back(make_shared<struct ibv_mr>(*rdma_reg_msgs(connectionID, recvBuffers[i], 16)));
+        recvMRs.push_back(make_shared<struct ibv_mr *>(rdma_reg_msgs(connectionID, recvBuffers[i], 16)));
     }
 
     cout << "Populated receive memory regions" << endl;
@@ -143,13 +143,13 @@ bool RDMAServer::setupConnection(string server, string portnum)
         goto BAD_SERVER_CALL;
     }*/
     for (int i = 0; i < 100; i++) {
-        sendMRs.push_back(make_shared<struct ibv_mr>(*rdma_reg_msgs(connectionID, sendBuffers[i], 16)));
+        sendMRs.push_back(make_shared<struct ibv_mr *>(rdma_reg_msgs(connectionID, sendBuffers[i], 16)));
     }
 
     cout << "Populated send memory regions" << endl;
 
     // Prepare for incoming message
-    ret = rdma_post_recv(connectionID, NULL, recvBuffers[0], 16, recvMRs[0].get());
+    ret = rdma_post_recv(connectionID, NULL, recvBuffers[0], 16, *recvMRs[0]);
     if (ret != 0) {
         cerr << "Server failed to receive connection message";
         goto BAD_SERVER_CALL;
@@ -216,12 +216,12 @@ int RDMAServer::receiveData()
     cout << "Number of bytes to receive: " << numBytes << endl;
     cout << "Number of reqs to post: " << numReqs << endl;
 
-    ret = rdma_post_recv(connectionID, NULL, recvBuffers[0], 16, recvMRs[0].get());
+    ret = rdma_post_recv(connectionID, NULL, recvBuffers[0], 16, *recvMRs[0]);
 
     auto start = chrono::high_resolution_clock::now();
 
     // Post a send to start the transfer
-    ret = rdma_post_send(connectionID, NULL, sendBuffers[0], 16, sendMRs[0].get(), IBV_SEND_INLINE);
+    ret = rdma_post_send(connectionID, NULL, sendBuffers[0], 16, *sendMRs[0], IBV_SEND_INLINE);
     if (ret != 0) {
         cerr << "Failed to post send work request: " << errno << endl;
     }
@@ -231,10 +231,9 @@ int RDMAServer::receiveData()
 
     // Receive the data
     for (i = 0; i < 100 && numReqs > 0; ++i, --numReqs) {
-    	ret = rdma_post_recv(connectionID, NULL, recvBuffers[i], 16, recvMRs[i].get());
+        ret = rdma_post_recv(connectionID, NULL, recvBuffers[i], 16, *recvMRs[i]);
         while((ret = rdma_get_recv_comp(connectionID, &workCompletion)) == 0) {}
-
-        ret = rdma_post_send(connectionID, NULL, sendBuffers[0], 16, sendMRs[0].get(), IBV_SEND_INLINE);
+        ret = rdma_post_send(connectionID, NULL, sendBuffers[0], 16, *sendMRs[0], IBV_SEND_INLINE);
 
         if (i == 99) {
             i = -1;
@@ -253,6 +252,7 @@ int RDMAServer::receiveData()
     cout << (char *)recvBuffers[0];
 
     cout << endl << endl << "Time spent transmitting: " << duration.count() << " microseconds" << endl;
+
     cout << endl << endl << endl << "RDMA Reception Complete" << endl;
 
     return 0;

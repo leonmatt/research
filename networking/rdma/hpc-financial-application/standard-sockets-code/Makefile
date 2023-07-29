@@ -4,7 +4,7 @@ CFLAGS = -g -std=c++23 -Wall -pedantic
 all: client server
 
 clean:
-	rm -rf bin
+	rm -rf ../bin
 
 client: client.cpp
 	$(CPP) $(CFLAGS) -o standard_client client.cpp

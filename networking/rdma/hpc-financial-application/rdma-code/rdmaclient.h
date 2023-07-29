@@ -29,8 +29,8 @@ public:
     string devName;
 
     // The memory regions for data communications
-    vector<shared_ptr<struct ibv_mr>> recvMRs;
-    vector<shared_ptr<struct ibv_mr>> sendMRs;
+    vector<shared_ptr<struct ibv_mr *>> recvMRs;
+    vector<shared_ptr<struct ibv_mr *>> sendMRs;
 
     RDMAClient(string deviceName)
     {
