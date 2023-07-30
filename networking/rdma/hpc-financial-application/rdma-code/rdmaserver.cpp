@@ -220,6 +220,8 @@ int RDMAServer::receiveData()
 
     auto start = chrono::high_resolution_clock::now();
 
+    auto start = chrono::high_resolution_clock::now();
+
     // Post a send to start the transfer
     ret = rdma_post_send(connectionID, NULL, sendBuffers[0], 16, *sendMRs[0], IBV_SEND_INLINE);
     if (ret != 0) {
