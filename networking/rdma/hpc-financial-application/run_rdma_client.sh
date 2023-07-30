@@ -6,7 +6,7 @@
 #
 
 # Compile the code
-cd standard-sockets-code && make client && cd ..
+cd rdma-code && make client && cd ..
 
 # Run the server in the network ns
-sudo ip netns exec net0 ./bin/standard_client config.txt
+sudo ip netns exec net0 ./bin/rdma_client config.txt

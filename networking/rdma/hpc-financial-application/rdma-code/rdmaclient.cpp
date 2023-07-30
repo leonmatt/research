@@ -86,14 +86,14 @@ bool RDMAClient::setupConnection(string server, string portnum)
 	attr.cap.max_recv_wr = 100;
 	attr.cap.max_send_sge = 1;
 	attr.cap.max_recv_sge = 1;
-	attr.cap.max_inline_data = 16;
+	//attr.cap.max_inline_data = 16;
     attr.sq_sig_all = 1;
     attr.qp_context = tmpID;
 
     // Create the communication endpoint
     ret = rdma_create_ep(&tmpID, res, NULL, &attr);
     if (ret != 0) {
-        cerr << "Failed to create endpoint." << errno << endl;
+        cerr << "Failed to create endpoint." << strerror(errno) << endl;
         goto BAD_ENDPOINT;
     }
     
@@ -101,19 +101,19 @@ bool RDMAClient::setupConnection(string server, string portnum)
 
     // Set up receive buffers
     for (int i = 0; i < 100; i++) {
-        recvMRs.push_back(make_shared<struct ibv_mr>(*rdma_reg_msgs(connectionID, recvBuffers[i], 16)));
+        recvMRs.push_back(make_shared<struct ibv_mr *>(rdma_reg_msgs(connectionID, recvBuffers[i], 16)));
     }
 
     cout << "Populated receive memory regions" << endl;
 
     for (int i = 0; i < 100; i++) {
-        sendMRs.push_back(make_shared<struct ibv_mr>(*rdma_reg_msgs(connectionID, sendBuffers[i], 16)));
+        sendMRs.push_back(make_shared<struct ibv_mr *>(rdma_reg_msgs(connectionID, sendBuffers[i], 16)));
     }
 
     cout << "Populated send memory regions" << endl;
 
     // Receive connection request response
-    ret = rdma_post_recv(connectionID, NULL, recvBuffers[0], 16, recvMRs[0].get());
+    ret = rdma_post_recv(connectionID, NULL, recvBuffers[0], 16, *recvMRs[0]);
     if (ret) {
         cerr << "Client failed to post receive work request." << endl;
         goto BAD_CLIENT_CALL;
@@ -200,7 +200,7 @@ int RDMAClient::sendData(string fname)
     memcpy(sendBuffers[0], to_string(fsize).c_str(), 16);
 
     // Send the number of bytes that will be sent over
-    int ret = rdma_post_send(connectionID, NULL, sendBuffers[0], 16, sendMRs[0].get(), IBV_SEND_INLINE);
+    int ret = rdma_post_send(connectionID, NULL, sendBuffers[0], 16, *sendMRs[0], IBV_SEND_INLINE);
     if (ret != 0) {
         cerr << "Failed to post send work request: " << errno << endl;
     }
@@ -213,11 +213,10 @@ int RDMAClient::sendData(string fname)
 
     for (i = 0; i < 100 && numReqs > 0; ++i, --numReqs) {
         dataFile.read((char*)&sendBuffers[i][0], 16);
-    	ret = rdma_post_recv(connectionID, NULL, recvBuffers[i], 16, recvMRs[i].get());
-        rdma_post_send(connectionID, NULL, sendBuffers[i], 16, sendMRs[i].get(), IBV_SEND_INLINE);
+        ret = rdma_post_recv(connectionID, NULL, recvBuffers[i], 16, *recvMRs[i]);
+        rdma_post_send(connectionID, NULL, sendBuffers[i], 16, *sendMRs[i], IBV_SEND_INLINE);
 
         while((ret = rdma_get_recv_comp(connectionID, &workCompletion)) == 0) {}
-
 
         if (i == 99) {
             i = -1;
