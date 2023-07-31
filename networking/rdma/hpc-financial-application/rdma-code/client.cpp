@@ -14,16 +14,12 @@ using namespace std;
 
 void parseConfiguration(const string& configName, string vars[]);
 
-
 int main(int argc, char *argv[], char *env[])
 {
 
     string fname = "config.txt";
 
     string vars[5];
-
-    string dataLine;
-    dataLine.resize(16);
 
     parseConfiguration(fname, vars);
 
