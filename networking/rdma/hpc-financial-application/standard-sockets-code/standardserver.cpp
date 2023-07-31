@@ -38,15 +38,15 @@ void StandardServer::setupConnection(string addr, string portNum)
 int StandardServer::receiveData()
 {
 
-    char dataBuffer[16] = {};
+    char dataBuffer[16] = {0};
 
     // Get first set of bytes
     send(serverSocket, dataBuffer, 16, 0);
 
+    recv(serverSocket, dataBuffer, 16, 0);
+
     int numBytes = stoi(dataBuffer);
     int numReqs = numBytes / 16 + 1;
-
-    recv(serverSocket, dataBuffer, 4, 0);
 
     auto start = chrono::high_resolution_clock::now();
 

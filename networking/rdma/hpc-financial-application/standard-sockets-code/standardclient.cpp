@@ -55,3 +55,39 @@ int StandardClient::receiveData()
     return 0;
 
 }
+
+int StandardClient::sendData(string fname)
+{
+    char dataBuffer[16] = {0};
+
+    int numBytes;
+    int numReqs;
+
+    ifstream dataFile(fname, ios::binary | ios::in);
+    if (!dataFile) {
+        cerr << "Failed to open file: " << fname << endl;
+    }
+
+    dataFile.seekg(0, dataFile.end);
+
+    int fsize = (int)dataFile.tellg();
+
+    dataFile.seekg(0, dataFile.beg);
+
+    numBytes = fsize;
+    numReqs = numBytes / 16 + 1;
+
+    memcpy(dataBuffer, to_string(numBytes).c_str(), sizeof(numBytes));
+
+    cout << "Sending: " << numBytes << endl;
+
+    send(clientSocket, dataBuffer, 16, 0);
+
+    recv(clientSocket, dataBuffer, 16, 0);
+
+    for (; numReqs > 0; numReqs--)
+        send(clientSocket, dataBuffer, 16, 0);
+
+    return 0;
+
+}

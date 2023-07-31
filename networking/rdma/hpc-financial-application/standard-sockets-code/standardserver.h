@@ -30,6 +30,11 @@ public:
     void setupConnection(string, string);
     bool releaseConnection();
 
+    int receiveData();
+    int sendMSG(string msg);
+
+    int getConnectionID();
+
 private:
 
     int socketNum;
@@ -37,11 +42,6 @@ private:
     sockaddr_in serverAddr;
 
     int serverSocket;
-
-    int getConnectionID();
-
-    int receiveData();
-    int sendMSG(string msg);
     
 };
 

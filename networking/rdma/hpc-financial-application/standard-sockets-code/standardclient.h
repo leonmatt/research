@@ -4,10 +4,19 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include <string>
+#include <string.h>
 
+#include <fstream>
 #include <iostream>
 
+#include <memory>
+#include <vector>
+
 #include <chrono>
+
+#include <filesystem>
+
+#include <cerrno>
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -30,6 +39,11 @@ public:
     void setupConnection(string, string);
     bool releaseConnection();
 
+    int receiveData();
+    int sendData(string);
+
+    int getConnectionID();
+
 private:
 
     int socketNum;
@@ -37,11 +51,6 @@ private:
     sockaddr_in serverAddr;
 
     int clientSocket;
-
-    int getConnectionID();
-
-    int receiveData();
-    int sendMSG(string msg);
 
 };
 
