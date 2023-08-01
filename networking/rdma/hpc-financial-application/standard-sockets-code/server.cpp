@@ -33,6 +33,9 @@ int main(int argc, char *argv[], char *env[])
     // Start the server
     sServer.setupConnection("0.0.0.0", vars[3]);
 
+    // Receive the data
+    sServer.receiveData();
+
     return 0;
 
 }

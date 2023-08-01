@@ -30,6 +30,9 @@ int main(int argc, char *argv[], char *env[])
     // Set up the client connection
     sClient.setupConnection(vars[2], vars[3]);
 
+    // Transfer the data
+    sClient.sendData(vars[4].c_str());
+
     return 0;
 
 }
