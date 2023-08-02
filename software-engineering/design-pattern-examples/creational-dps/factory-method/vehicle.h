@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 
+#include <memory>
+
 using namespace std;
 
 // Abstract Vehicle Class
@@ -68,23 +70,23 @@ public:
 };
 
 // Function for allocating a concrete Vehicle class
-Vehicle *getVehicle(uint distanceInMiles)
+shared_ptr<Vehicle> getVehicle(uint distanceInMiles)
 {
-    Vehicle *ret = NULL;
+    shared_ptr<Vehicle> ret = NULL;
 
     if (distanceInMiles <= 3.0) {
         cout << "Because your distance is less than 3 miles, we gave you a bike" << endl;
-        ret = new Bike("Bike");
+        ret = make_shared<Bike>("Bike");
     }
 
     else if (distanceInMiles > 3.0 && distanceInMiles < 300.0) {
         cout << "Because your distance is greater than 3 miles and less than 300 miles, we gave you a car" << endl;
-        ret = new Car("Car");
+        ret = make_shared<Car>("Car");
     }
 
     else {
         cout << "Because your distance is greater than 300 miles, we gave you a plane" << endl;
-        ret = new Car("Car");
+        ret = make_shared<Plane>("Plane");
     }
 
     return ret;

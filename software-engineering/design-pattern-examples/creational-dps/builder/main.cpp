@@ -8,16 +8,13 @@ SPDX-License-Identifier: BSD-3-Clause
 int main(void)
 {
 
-    ComputerStore *myIntelCB = new ComputerStore();
+    // Set up the ComputerStore
+    shared_ptr<ComputerStore> myIntelCB = make_shared<ComputerStore>();
 
-    Computer *myNewPC = myIntelCB->getComputer("Intel");
-    if (myNewPC != NULL) {
+    // Get a Computer
+    shared_ptr<Computer> myNewPC = myIntelCB->getComputer("Intel");
+    if (myNewPC)
         cout << "We got a new PC!" << endl;
-    }
-
-    // Release PCs
-    delete myNewPC;
-    delete myIntelCB;
 
     return 0;
 
