@@ -9,24 +9,16 @@ int main(void)
 {
 
     // Appliance Store/Factory
-    ApplianceStore *AS = (ApplianceStore *)getStore("Application");
- 
+    shared_ptr<ApplianceStore> AS = dynamic_pointer_cast<ApplianceStore>(getStore("Appliance"));
+
     // Furniture Store/Factory
-    FurnitureStore *FS = (FurnitureStore *)getStore("Furniture");
+    shared_ptr<FurnitureStore> FS = dynamic_pointer_cast<FurnitureStore>(getStore("Furniture"));
 
     // Get a Television from the Appliance Factory
-    Appliance *myTV = AS->getAppliance("Television");
+    shared_ptr<Appliance> myTV = AS->getAppliance("Television");
 
     // Get a Couch from the Furniture Factory
-    Furniture *myCouch = FS->getFurniture("Couch"); 
-
-    // Release Products
-    delete myTV;
-    delete myCouch;
-
-    // Release Stores
-    delete AS;
-    delete FS;
+    shared_ptr<Furniture> myCouch = FS->getFurniture("Couch");
 
     return 0;
 

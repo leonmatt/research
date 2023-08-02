@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 
+#include <memory>
+
 #include "appliance.h"
 #include "furniture.h"
 
@@ -22,6 +24,8 @@ class Store
 public:
 
     string storeType;
+
+    virtual ~Store() {}
 
 private:
 
@@ -40,27 +44,28 @@ public:
 
     ~FurnitureStore() {}
 
-    Furniture *getFurniture(string type)
+    shared_ptr<Furniture> getFurniture(string type)
     {
-
-        Furniture *ret = NULL;
+      
+        shared_ptr<Furniture> ret;
 
         if (type.compare("Table") == 0) {
             cout << "Getting a Table" << endl;
-            ret = new Table();
+            ret = make_shared<Table>();
         }
 
         else if (type.compare("Couch") == 0) {
             cout << "Getting a Couch" << endl;
-            ret = new Couch();
+            ret = make_shared<Couch>();
         }
 
         else if (type.compare("Chair") == 0) {
             cout << "Getting a Chair" << endl;
-            ret = new Chair();
+            ret = make_shared<Chair>();
         }
 
-        return ret;
+        return ret;  
+
     }
 
 };
@@ -77,45 +82,43 @@ public:
     }
     ~ApplianceStore() {}
 
-    Appliance *getAppliance(string type)
+    shared_ptr<Appliance> getAppliance(string type)
     {
 
-        Appliance *ret = NULL;
+        shared_ptr<Appliance> ret;
 
         if (type.compare("Television") == 0) {
             cout << "Getting a Television" << endl;
-            ret = new Television();
+            ret = make_shared<Television>();
         }
 
         else if (type.compare("Stove") == 0) {
             cout << "Getting a Stove" << endl;
-            ret = new Stove();
+            ret = make_shared<Stove>();
         }
 
         else if (type.compare("Refrigerator") == 0) {
             cout << "Getting a Refrigerator" << endl;
-            ret = new Refrigerator();
+            ret = make_shared<Refrigerator>();
         }
 
         return ret;
-    }
 
+    }
 
 };
 
 
 // Function for allocating a concrete Vehicle class
-Store *getStore(string typeOfStore)
+shared_ptr<Store> getStore(string typeOfStore)
 {
-    Store *ret = NULL;
+    shared_ptr<Store> ret;
 
-    if (typeOfStore.compare("Furniture")) {
-        ret = new FurnitureStore(typeOfStore);
-    }
+    if (typeOfStore.compare("Furniture"))
+        ret = make_shared<FurnitureStore>(typeOfStore);
 
-    else if (typeOfStore.compare("Appliance")) {
-        ret = new ApplianceStore(typeOfStore);
-    }
+    else if (typeOfStore.compare("Appliance"))
+        ret = make_shared<ApplianceStore>(typeOfStore);
 
     return ret;
 
