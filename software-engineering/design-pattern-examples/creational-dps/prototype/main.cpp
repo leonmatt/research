@@ -16,10 +16,10 @@ int main(void)
     int socketVal = 10;
 
     // Connection 1
-    Connection *serverConn1 = new ServerConnection(socketVal);
+    shared_ptr<Connection> serverConn1 = make_shared<ServerConnection>(socketVal);
 
     // Connection 2
-    Connection *serverConn2 = serverConn1->clone();
+    shared_ptr<Connection> serverConn2 = serverConn1->clone();
 
     // Dump the class data
     cout << endl;
@@ -28,10 +28,6 @@ int main(void)
     cout << endl;
     cout << "Connection 1 Descriptor: " << serverConn1->socketVal << endl;
     cout << "Connection 2 Descriptor: " << serverConn2->socketVal << endl;
-
-    // Release Server Connections
-    delete serverConn1;
-    delete serverConn2;
 
     return 0;
 

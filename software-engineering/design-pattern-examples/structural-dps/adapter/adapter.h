@@ -7,7 +7,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #define TARGETADAPTER_H
 
 #include <iostream>
+
 #include <string>
+
+#include <memory>
 
 #include "target.h"
 
@@ -18,9 +21,9 @@ class TargetAdapter : Target
 
 public:
 
-    Target *adaptedTarget;
+    shared_ptr<Target> adaptedTarget;
 
-    TargetAdapter(Target *Target)
+    TargetAdapter(shared_ptr<Target> Target)
     {
         adaptedTarget = Target;
     }

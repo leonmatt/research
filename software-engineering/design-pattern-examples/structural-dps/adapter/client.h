@@ -8,6 +8,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <string>
 
+#include <memory>
+
 #include "adapter.h"
 
 using namespace std;
@@ -27,7 +29,7 @@ public:
     }
     ~Client() {}
 
-    void transferDataToTarget(TargetAdapter *adapter)
+    void transferDataToTarget(shared_ptr<TargetAdapter >adapter)
     {
 
         adapter->setTargetValue(clientValue);

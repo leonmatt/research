@@ -6,13 +6,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #ifndef SERVER_H
 #define SERVER_H
 
+#include <memory>
+
+using namespace std;
+
 // Abstract Connection Class
 class Connection
 {
 
 public:
 
-    virtual Connection *clone() const = 0;
+    virtual shared_ptr<Connection> clone() const = 0;
 
     int socketVal;
 
@@ -24,7 +28,6 @@ class ServerConnection : public Connection
 
 public:
 
-    //ServerConnection(int inputSocket)
     ServerConnection(int inputSocket)
     {
 
@@ -33,9 +36,9 @@ public:
     }
     ~ServerConnection() {}
 
-    Connection *clone() const override
+    shared_ptr<Connection> clone() const override
     {
-        return new ServerConnection(*this);
+        return make_shared<ServerConnection>(socketVal);
     }
 
 };
