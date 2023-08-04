@@ -9,7 +9,7 @@ int main(void)
 {
 
     // Allocate Hardware Group
-    HardwareGroup *myGroup = new HardwareGroup();
+    shared_ptr<HardwareGroup> myGroup = make_shared<HardwareGroup>();
 
     // Allocate Hardware Devices
     myGroup->addDevice(getHardwareDevice("XEON"));
@@ -19,9 +19,6 @@ int main(void)
 
     // Build the Hardware Devices
     myGroup->build();
-
-    // Remove the Hardware Group
-    delete myGroup;
 
     return 0;
 

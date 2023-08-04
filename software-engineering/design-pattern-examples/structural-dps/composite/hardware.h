@@ -7,8 +7,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #define HARDWARE_H
 
 #include <string>
+
 #include <iostream>
+
 #include <vector>
+
 #include <memory>
 
 using namespace std;
@@ -22,7 +25,7 @@ public:
 
 };
 
-class XEONCPU : HardwareDevice
+class XEONCPU : public HardwareDevice
 {
 
 public:
@@ -41,7 +44,7 @@ public:
 
 };
 
-class CoreCPU : HardwareDevice
+class CoreCPU : public HardwareDevice
 {
 
 public:
@@ -60,7 +63,7 @@ public:
 
 };
 
-class E810NIC : HardwareDevice
+class E810NIC : public HardwareDevice
 {
 
 public:
@@ -79,7 +82,7 @@ public:
 
 };
 
-class IPUNIC : HardwareDevice
+class IPUNIC : public HardwareDevice
 {
 
 public:
@@ -133,23 +136,21 @@ public:
 shared_ptr<HardwareDevice> getHardwareDevice(string kind)
 {
 
-    HardwareDevice *ptr = NULL;
+    shared_ptr<HardwareDevice> ptr = NULL;
 
     if (kind.compare("XEON") == 0)
-        ptr = (HardwareDevice *)new XEONCPU();
+        ptr = dynamic_pointer_cast<HardwareDevice>(shared_ptr<XEONCPU>(new XEONCPU()));
 
     else if (kind.compare("Core") == 0)
-        ptr = (HardwareDevice *)new CoreCPU();
+        ptr = dynamic_pointer_cast<HardwareDevice>(shared_ptr<CoreCPU>(new CoreCPU()));
 
     if (kind.compare("E810") == 0)
-        ptr = (HardwareDevice *)new E810NIC();
+        ptr = dynamic_pointer_cast<HardwareDevice>(shared_ptr<E810NIC>(new E810NIC()));
 
     else if (kind.compare("IPU") == 0)
-        ptr = (HardwareDevice *)new IPUNIC();
+        ptr = dynamic_pointer_cast<HardwareDevice>(shared_ptr<IPUNIC>(new IPUNIC()));
 
-    shared_ptr<HardwareDevice> ret(ptr);
-
-    return ret;
+    return ptr;
 
 }
 
