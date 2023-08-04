@@ -7,7 +7,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #define CONNECTION_H
 
 #include <string>
+
 #include <iostream>
+
+#include <memory>
 
 #include "message.h"
 
@@ -24,19 +27,16 @@ public:
 };
 
 // Concrete Interface
-class NetworkConnection : Connection
+class NetworkConnection : public Connection
 {
 
 public:
 
-    NetworkConnection(MessageInterface *interface) 
+    NetworkConnection(shared_ptr<MessageInterface> interface) 
     {
         msgIntf = interface;
     }
-    ~NetworkConnection() 
-    {
-        delete msgIntf;
-    }
+    ~NetworkConnection() {}
 
     void sendMessage(string msg) override
     {
@@ -45,12 +45,12 @@ public:
 
 private:
 
-    MessageInterface *msgIntf;
+    shared_ptr<MessageInterface> msgIntf;
 
 };
 
 // Concrete Interface
-class DatabaseConnection : Connection
+class DatabaseConnection : public Connection
 {
 
 public:
@@ -65,48 +65,48 @@ public:
 
 private:
 
-    MessageInterface *msgIntf;
+    shared_ptr<MessageInterface> msgIntf;
 
 };
 
 
 // Returns a Network Connection
-NetworkConnection *getNetworkConnection(string protocol)
+shared_ptr<NetworkConnection> getNetworkConnection(string protocol)
 {
 
     // The kind of network protocol
-    MessageInterface *msgIntf = NULL;
+    shared_ptr<MessageInterface> msgIntf = NULL;
     
     if (protocol == "GRPC")
-       msgIntf = (MessageInterface *)new GRPCInterface();
+       msgIntf = make_shared<GRPCInterface>();
     
     else if (protocol == "MPI")
-        msgIntf = (MessageInterface *)new MPIInterface();
+        msgIntf = make_shared<MPIInterface>();
     
-    return new NetworkConnection(msgIntf);
+    return make_shared<NetworkConnection>(msgIntf);
 
 };
 
 
-// Returns a Network Connection
-DatabaseConnection *getDatabaseConnection()
+// Returns a Database Connection
+shared_ptr<DatabaseConnection> getDatabaseConnection()
 {
 
-    return new DatabaseConnection();
+    return make_shared<DatabaseConnection>();
 
 }
 
 // Returns a new connection
-Connection *getConnection(string kind, string protocol)
+shared_ptr<Connection> getConnection(string kind, string protocol)
 {
 
-    Connection *ret = NULL;
+    shared_ptr<Connection> ret;
 
     if (kind == "Network")
-        ret = (Connection *)getNetworkConnection(protocol);
+        ret = dynamic_pointer_cast<Connection>(getNetworkConnection(protocol));
     
     else if (kind == "Database")
-        ret = (Connection *)getDatabaseConnection();
+        ret = dynamic_pointer_cast<Connection>(getDatabaseConnection());
 
     return ret;
 

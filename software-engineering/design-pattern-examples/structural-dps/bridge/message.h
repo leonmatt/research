@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #define MESSAGE_H
 
 #include <string>
+
 #include <iostream>
 
 using namespace std;
@@ -22,7 +23,7 @@ public:
 };
 
 // Concrete Interface
-class GRPCInterface : MessageInterface
+class GRPCInterface : public MessageInterface
 {
 
 public:
@@ -38,7 +39,7 @@ public:
 };
 
 // Concrete Interface
-class MPIInterface : MessageInterface
+class MPIInterface : public MessageInterface
 {
 
 public:

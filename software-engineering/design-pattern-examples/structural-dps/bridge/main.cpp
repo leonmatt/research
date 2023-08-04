@@ -9,14 +9,12 @@ int main(void)
 {
 
     // Set up NetworkConnections
-    Connection *connectionGRPC = getConnection("Network", "GRPC");
-    Connection *connectionMPI = getConnection("Network", "MPI");
+    shared_ptr<Connection> connectionGRPC = getConnection("Network", "GRPC");
+    shared_ptr<Connection> connectionMPI  = getConnection("Network", "MPI");
 
+    // Send messages using each Connection
     connectionGRPC->sendMessage("Hello World!");
     connectionMPI->sendMessage("Hello World!");
-
-    delete connectionGRPC;
-    delete connectionMPI;
 
     return 0;
 
