@@ -28,6 +28,7 @@ public class Orchestrator
         switch(capQualities) {
             case 1:
                 System.out.println("Running with Consistency and Availability\n");
+                System.out.println("The system is unable to handle network errors\n");
                 break;
             case 2:
                 System.out.println("Running with Consistency and Partitioning\n");
@@ -41,8 +42,9 @@ public class Orchestrator
 
         Random rng = new Random();
         int newValue;
+        boolean continueProcessing = true;
 
-        while(true) {
+        while (continueProcessing) {
 
             // Consistency and Availability
             if (capQualities == 1) {
@@ -51,14 +53,24 @@ public class Orchestrator
                 System.out.println("Writing " + newValue + " to the Nodes\n");
                 for (int i = 0; i < numberOfNodes; i++)
                     nodes.get(i).write(newValue);
-                
+
                 newValue = rng.nextInt(numberOfNodes);
 
                 System.out.println("Value stored in Node " + newValue + " is: " + nodes.get(newValue).read() + "\n");
 
                 try {
-                    Thread.sleep(1000);
+
+                    Thread.sleep(500);
+
                 } catch (InterruptedException e) {}
+
+                if (rng.nextInt(10) <= 1) {
+
+                    System.out.println("The Network Partition just failed and we are unable to recover\n");
+
+                    continueProcessing = false;
+
+                }
 
             }
 
