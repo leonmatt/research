@@ -6,8 +6,10 @@ SPDX-License-Identifier: BSD-3-Clause
 import java.io.*;
 import java.util.*;
 
-class Main
+public class Main
 {
+
+    public static Orchestrator o;
 
     public static void main(String args[])
     {
@@ -25,6 +27,12 @@ class Main
             else
                 System.out.println("\n\nYou gave an invalid input, give a number between 1 and 3\n\n");
         }
+
+        System.out.println("\n");
+
+        o = new Orchestrator(10, choice);
+
+        o.startOrchestrator();
 
     }
 
