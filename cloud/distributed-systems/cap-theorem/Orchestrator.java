@@ -27,21 +27,33 @@ public class Orchestrator
 
         switch(capQualities) {
             case 1:
+
                 System.out.println("Running with Consistency and Availability\n");
-                System.out.println("The system is unable to handle network errors\n");
+                System.out.println("Sometimes the Network goes down\n");
+
                 break;
+
             case 2:
+
                 System.out.println("Running with Consistency and Partitioning\n");
+                System.out.println("Sometimes the Node fails\n");
+
                 break;
             case 3:
+
                 System.out.println("Running with Availability and Partitioning\n");
+                System.out.println("Sometimes the Node doesn't receive write requests\n");
+
                 break;
         }
 
         System.out.println("Starting the Orchestrator\n");
 
         Random rng = new Random();
+
         int newValue;
+        int actualValue;
+
         boolean continueProcessing = true;
 
         while (continueProcessing) {
@@ -71,6 +83,64 @@ public class Orchestrator
                     continueProcessing = false;
 
                 }
+
+            }
+
+            // Consistency and Partitioning
+            if (capQualities == 2) {
+
+                newValue = rng.nextInt(100);
+                System.out.println("Writing " + newValue + " to the Nodes\n");
+                for (int i = 0; i < numberOfNodes; i++)
+                    nodes.get(i).write(newValue);
+
+
+                    newValue = rng.nextInt(numberOfNodes);
+
+                    if (rng.nextInt(10) <= 1) {
+
+                        System.out.println("Node " + newValue + " that we want to read from is down\n");
+    
+                        continueProcessing = false;
+    
+                    }
+                    else {
+
+                        System.out.println("Value stored in Node " + newValue + " is: " + nodes.get(newValue).read() + "\n");
+
+                    }
+
+                try {
+
+                    Thread.sleep(500);
+
+                } catch (InterruptedException e) {}
+
+            }
+
+            // Availability and Partitioning
+            if (capQualities == 3) {
+
+                actualValue = rng.nextInt(100);
+                System.out.println("Writing " + actualValue + " to the Nodes\n");
+                for (int i = 0; i < numberOfNodes; i++)
+                    if (rng.nextInt(100) >= 15)
+                        nodes.get(i).write(actualValue);
+
+                    newValue = rng.nextInt(numberOfNodes);
+
+                    System.out.println("Value stored in Node " + newValue + " is: " + nodes.get(newValue).read() + "\n");
+                    System.out.println("The actual value should be: " + actualValue + "\n");
+
+                    if (nodes.get(newValue).read() != actualValue)
+
+                        continueProcessing = false;
+
+                try {
+
+                    Thread.sleep(500);
+
+                } catch (InterruptedException e) {}
 
             }
 
