@@ -50,8 +50,10 @@ public class Orchestrator
         System.out.println("Starting the Orchestrator\n");
 
         Random rng = new Random();
+
         int newValue;
         int actualValue;
+
         boolean continueProcessing = true;
 
         while (continueProcessing) {
