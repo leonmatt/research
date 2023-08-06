@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 # Import required modules
 import numpy as np
 
+from sklearn.datasets import make_regression
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
@@ -15,8 +16,7 @@ seed = 42
 np.random.seed(seed)
 
 # Generate the data
-X = np.random.rand(10000, 1)
-Y = 72 + X * np.random.rand(10000, 1)
+X, Y = make_regression(n_samples=10000, n_features=1, noise=0.15, random_state=seed)
 
 # Split the data so we can fit and test
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=seed)
