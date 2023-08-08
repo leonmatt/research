@@ -22,6 +22,7 @@ X, Y = make_classification(n_samples=10000, n_features=10, n_informative=7, rand
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=seed)
 
 # Initialize and fit the model to our generated data
+# Model that classifies instead of regressions a discrete output
 LRModel = LogisticRegression()
 LRModel.fit(X_train, y_train)
 

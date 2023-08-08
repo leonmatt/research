@@ -26,6 +26,7 @@ Y = Y + np.sum(x_poly[:, 1:], axis=1)
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=seed)
 
 # Initialize and fit the model to our generated data
+# Model with features that are nth degree to the output
 LRModel = LinearRegression()
 LRModel.fit(X_train, y_train)
 

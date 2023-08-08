@@ -26,11 +26,12 @@ Y = Y + np.sum(x_poly[:, 1:], axis=1)
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=seed)
 
 # Initialize and fit the model to our generated data
-LRModel = Ridge(alpha=0.1)
-LRModel.fit(X_train, y_train)
+# Model with L2 regularization penalty
+RModel = Ridge(alpha=0.1)
+RModel.fit(X_train, y_train)
 
 # Test the model
-y_prediction = LRModel.predict(X_test)
+y_prediction = RModel.predict(X_test)
 
 # Get the accuracy
 mse = mean_squared_error(y_test, y_prediction)

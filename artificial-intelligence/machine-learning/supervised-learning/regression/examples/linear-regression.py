@@ -22,6 +22,7 @@ X, Y = make_regression(n_samples=10000, n_features=1, noise=0.15, random_state=s
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=seed)
 
 # Initialize and fit the model to our generated data
+# This model just runs a basic regression with a single feature
 LRModel = LinearRegression()
 LRModel.fit(X_train, y_train)
 
