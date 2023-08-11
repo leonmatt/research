@@ -6,11 +6,11 @@ SPDX-License-Identifier: BSD-3-Clause
 # Import required modules
 import numpy as np
 
-from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
-
+ 
 # Set nummpy random seed
 seed = 42
 np.random.seed(seed)
@@ -23,11 +23,11 @@ X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_
 
 # Initialize and fit the model to our generated data
 # Model that classifies instead of regressions a discrete output
-LRModel = LogisticRegression()
-LRModel.fit(X_train, y_train)
+RFModel = RandomForestClassifier(n_estimators=10, random_state=seed)
+RFModel.fit(X_train, y_train)
 
 # Test the model
-y_prediction = LRModel.predict(X_test)
+y_prediction = RFModel.predict(X_test)
 
 # Get the accuracy
 accuracy_score = accuracy_score(y_test, y_prediction)
