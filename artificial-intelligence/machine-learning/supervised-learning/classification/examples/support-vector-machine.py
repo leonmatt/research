@@ -10,7 +10,7 @@ from sklearn.datasets import make_classification
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.metrics import accuracy_score, classification_report
 
 # Set nummpy random seed
 seed = 42
@@ -36,11 +36,8 @@ SVCModel.fit(X_train, y_train)
 y_prediction = SVCModel.predict(X_test)
 
 # Get the accuracy
-precision = precision_score(y_test, y_prediction)
-print(f"Precision: {precision:.2f}")
+accuracy_score = accuracy_score(y_test, y_prediction)
 
-recall = recall_score(y_test, y_prediction)
-print(f"Recall: {recall:.2f}")
-
-f1 = f1_score(y_test, y_prediction)
-print(f"F1 Score: {f1:.2f}")
+# Get the accuracy
+print(f"The Model's Accuracy is: {accuracy_score * 100:.2f}%")
+print(f"Model Report: {classification_report(y_test, y_prediction)}")
