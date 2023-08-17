@@ -10,7 +10,7 @@ from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 from sklearn.metrics import adjusted_rand_score
 
-# Set nummpy random seed
+# Set numpy random seed
 seed = 42
 np.random.seed(seed)
 
