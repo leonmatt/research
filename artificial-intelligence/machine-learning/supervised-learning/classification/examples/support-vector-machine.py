@@ -12,7 +12,7 @@ from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
 
-# Set nummpy random seed
+# Set numpy random seed
 seed = 42
 np.random.seed(seed)
 

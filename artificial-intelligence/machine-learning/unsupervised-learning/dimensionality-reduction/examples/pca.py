@@ -9,7 +9,7 @@ import numpy as np
 from sklearn.datasets import make_regression
 from sklearn.decomposition import PCA
 
-# Set nummpy random seed
+# Set numpy random seed
 seed = 42
 np.random.seed(seed)
 

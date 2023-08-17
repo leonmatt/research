@@ -12,7 +12,7 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
-# Set nummpy random seed
+# Set numpy random seed
 seed = 42
 np.random.seed(seed)
 
