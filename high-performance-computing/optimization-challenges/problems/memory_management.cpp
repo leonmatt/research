@@ -9,6 +9,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace std;
 
+/*
+
+    In this code, we need to allocate the nums memory, but the way this is done is quite inefficient.
+    The goal is to find a way to allocate the memory more efficiently than the current solution provides.
+
+*/
+
 
 int main(int argc, char **argv)
 {
