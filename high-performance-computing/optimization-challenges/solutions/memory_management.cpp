@@ -9,6 +9,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace std;
 
+/*
+
+   The solution for this challenge is to move the memory allocation out of the loop.
+   High performance and high frequency trading code will allocate memory before
+   it enters the hotpath, to minimize unnecessary memory allocation.
+
+*/
 
 int main(int argc, char **argv)
 {

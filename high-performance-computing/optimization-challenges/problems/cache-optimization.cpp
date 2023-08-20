@@ -11,25 +11,32 @@ using namespace std;
 
 /*
 
-    In this code, we need to allocate the nums memory, but the way this is done is quite inefficient.
-    The goal is to find a way to allocate the memory more efficiently than the current solution provides.
-
+    In this code, we need to find the summation of a matrix.
+    Unfortunately the code is not cache-optimized, so find a way to make it more cache-efficient.
+    We still need to sum the matrix values.
 */
+
 
 int main(int argc, char **argv)
 {
 
-    int n = 1000000;
+    int n = 1000;
+
+    int matrix[n][n];
 
     // BEING HOTPATH CODE
     auto start = chrono::high_resolution_clock::now();
 
-    for(int i = 0; i < 1000000; i++)
-    {
-        int *nums = new int[10];
-        delete nums;
-    }
+    // Populate matrix
+    for (int j = 0; j < n; j++)
+        for (int i = 0; i < n; i++)
+            matrix[i][j] = i * j;
 
+    int sum = 0;
+    for (int j = 0; j < n; j++)
+        for (int i = 0; i < n; i++)
+            sum += matrix[i][j];
+    
     // END HOTPATH CODE
     auto stop = chrono::high_resolution_clock::now();
 
