@@ -9,18 +9,20 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <string>
 
+#include <memory>
+
 #include "target.h"
 
 using namespace std;
 
-class TargetAdapter : Target
+class TargetAdapter : public Target
 {
 
 public:
 
-    Target *adaptedTarget;
+    shared_ptr<Target> adaptedTarget;
 
-    TargetAdapter(Target *Target)
+    TargetAdapter(shared_ptr<Target> Target)
     {
         adaptedTarget = Target;
     }
