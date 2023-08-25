@@ -12,6 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <vector>
 
+#include <memory>
+
 #include "CPU.h"
 #include "MB.h"
 #include "RAM.h"
@@ -27,22 +29,20 @@ public:
 
     string description;
 
-    CPU *cCPU;
-    MB *cMB;
-    RAM *cRAM;
-    DISK *cDISK;
-    PS *cPS;
+    //CPU *cCPU;
+    //MB *cMB;
+    //RAM *cRAM;
+    //DISK *cDISK;
+    //PS *cPS;
+
+    shared_ptr<CPU> cCPU;
+    shared_ptr<MB> cMB;
+    shared_ptr<RAM> cRAM;
+    shared_ptr<DISK> cDISK;
+    shared_ptr<PS> cPS;
 
     Computer() {}
-    ~Computer() {
-
-        delete cCPU;
-        delete cMB;
-        delete cRAM;
-        delete cDISK;
-        delete cPS;
-
-    }
+    ~Computer() {}
 
 };
 
@@ -69,7 +69,8 @@ public:
 
     void buildComputer() override {
 
-        Computer *newComp = new Computer();
+        //Computer *newComp = new Computer();
+        shared_ptr<Computer> newComp = make_shared<Computer>();
 
         newComp->cCPU = getCPU();
         newComp->cMB = getMB();
@@ -81,9 +82,11 @@ public:
 
     }
 
-    Computer *getComputer() {
+    shared_ptr<Computer> getComputer() 
+    {
 
-        Computer *ret = computersInStock[0];
+       // Computer *ret = computersInStock[0];
+        shared_ptr<Computer> ret = computersInStock[0];
 
         computersInStock.pop_back();
 
@@ -93,26 +96,31 @@ public:
 
 private:
 
-    vector<Computer *> computersInStock;
+    vector<shared_ptr<Computer>> computersInStock;
 
-    CPU *getCPU(){
-        return new CPU();
+    shared_ptr<CPU> getCPU()
+    {
+        return make_shared<CPU>();
     }
 
-    MB *getMB(){
-        return new MB();
+    shared_ptr<MB> getMB()
+    {
+        return make_shared<MB>();
     }
 
-    RAM *getRAM(){
-        return new RAM();
+    shared_ptr<RAM> getRAM()
+    {
+        return make_shared<RAM>();
     }
 
-    PS *getPS(){
-        return new PS();
+    shared_ptr<PS> getPS()
+    {
+        return make_shared<PS>();
     }
 
-    DISK *getDISK(){
-        return new DISK();
+    shared_ptr<DISK> getDISK()
+    {
+        return make_shared<DISK>();
     }
 
 };
@@ -123,29 +131,27 @@ class ComputerStore
 
 public:
 
-    IntelComputerBuilder *intelSupplier;
+    //IntelComputerBuilder *intelSupplier;
+    shared_ptr<IntelComputerBuilder> intelSuppplier;
 
     ComputerStore() {
 
-        intelSupplier = new IntelComputerBuilder();
+        intelSuppplier = make_shared<IntelComputerBuilder>();
 
     }
 
-    ~ComputerStore() {
+    ~ComputerStore() {}
 
-        delete intelSupplier;
+    shared_ptr<Computer> getComputer(string computerBrand)
+    {
 
-    }
-
-    Computer *getComputer(string computerBrand) {
-
-        Computer *ret = NULL;
+        shared_ptr<Computer> ret;
 
         if (computerBrand.compare("Intel") == 0) {
 
-            intelSupplier->buildComputer();
+            intelSuppplier->buildComputer();
 
-            ret = intelSupplier->getComputer();
+            ret = intelSuppplier->getComputer();
 
         }
 

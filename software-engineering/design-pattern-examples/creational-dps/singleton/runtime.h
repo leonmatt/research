@@ -6,18 +6,21 @@ SPDX-License-Identifier: BSD-3-Clause
 #ifndef RUNTIME_H
 #define RUNTIME_H
 
-// Concrete Runtime Class
+#include <memory>
 
+using namespace std;
+
+// Concrete Runtime Class
 class Runtime
 {
 
 public:
 
-    static Runtime *getRuntime()
+    static shared_ptr<Runtime> getRuntime()
     {
 
-        if (currentRuntime == nullptr) {
-            currentRuntime = new Runtime();
+        if (!currentRuntime) {
+            currentRuntime = shared_ptr<Runtime>(new Runtime);
         }
 
         return currentRuntime;
@@ -28,13 +31,13 @@ public:
 
 private:
 
-    static Runtime *currentRuntime;
+    static shared_ptr<Runtime> currentRuntime;
 
     Runtime()  {}
     Runtime(const Runtime &copy) {}
 
 };
 
-Runtime *Runtime::currentRuntime = nullptr;
+shared_ptr<Runtime> Runtime::currentRuntime;
 
 #endif // RUNTIME_H

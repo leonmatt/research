@@ -5,6 +5,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <cerrno>
 
+#include <chrono>
+
 #include <string>
 
 #include <iostream>
@@ -14,6 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <netdb.h>
 
+#include <infiniband/verbs.h>
 #include <rdma/rdma_verbs.h>
 #include <rdma/rdma_cma.h>
 

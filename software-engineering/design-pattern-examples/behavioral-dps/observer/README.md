@@ -3,7 +3,7 @@
 The Observer Pattern is a Behavioral Design Pattern that creates a one-to-many relationship
 between an object and a bunch of other objects.
 
-The general idea is that if we want to implement an event-driver architecture, where an
+The general idea is that if we want to implement an event-driven architecture, where an
 event propagates to other components in the software system. In this kind of system we would
 have an object that receives an event, and sends that event to a collection of objects that it
 has access to.

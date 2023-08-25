@@ -3,10 +3,6 @@ Copyright (C) 2023 Matthew Leon
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include <infiniband/verbs.h>
-
-#include <chrono>
-
 #include "rdmaserver.h"
 
 static uint8_t recvBuffers[100][16];
@@ -217,8 +213,6 @@ int RDMAServer::receiveData()
     cout << "Number of reqs to post: " << numReqs << endl;
 
     ret = rdma_post_recv(connectionID, NULL, recvBuffers[0], 16, *recvMRs[0]);
-
-    auto start = chrono::high_resolution_clock::now();
 
     auto start = chrono::high_resolution_clock::now();
 

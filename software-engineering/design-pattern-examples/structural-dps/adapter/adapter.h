@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #define TARGETADAPTER_H
 
 #include <iostream>
+
 #include <string>
 
 #include <memory>
