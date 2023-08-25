@@ -29,8 +29,11 @@ public:
     }
     ~Client() {}
 
-    void transferDataToTarget(shared_ptr<TargetAdapter >adapter)
+    void transferDataToTarget(shared_ptr<TargetAdapter> adapter)
+
     {
+
+        cout << "SENDING DATA: " << clientValue << endl;
 
         adapter->setTargetValue(clientValue);
 

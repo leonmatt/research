@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace std;
 
-class TargetAdapter : Target
+class TargetAdapter : public Target
 {
 
 public:
