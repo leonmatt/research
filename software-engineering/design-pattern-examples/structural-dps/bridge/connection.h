@@ -69,7 +69,6 @@ private:
 
 };
 
-
 // Returns a Network Connection
 shared_ptr<NetworkConnection> getNetworkConnection(string protocol)
 {
