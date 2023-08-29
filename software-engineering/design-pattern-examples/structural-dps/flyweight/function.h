@@ -3,6 +3,9 @@ Copyright (C) 2023 Matthew Leon
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#ifndef FUNCTION_H
+#define FUNCTION_H
+
 #include <memory>
 
 #include "context.h"
@@ -44,3 +47,5 @@ private:
     shared_ptr<Context> currentContext;
 
 };
+
+#endif // FUNCTION_H
