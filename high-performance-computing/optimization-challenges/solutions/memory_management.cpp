@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 
     int n = 1000000;
 
-    // BEING HOTPATH CODE
+    // BEGIN HOTPATH CODE
     auto start = chrono::high_resolution_clock::now();
 
     int *nums = new int[10];
