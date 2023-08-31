@@ -22,17 +22,17 @@ int main(int argc, char **argv)
 
     int n = 1000000;
 
+    int *nums = new int[10];
+
     // BEGIN HOTPATH CODE
     auto start = chrono::high_resolution_clock::now();
 
-    int *nums = new int[10];
-
     for(int i = 0; i < 1000000; i++) {}
-
-    delete nums;
 
     // END HOTPATH CODE
     auto stop = chrono::high_resolution_clock::now();
+
+    delete nums;
 
     auto totalTime = chrono::duration_cast<std::chrono::microseconds>(stop - start);
 

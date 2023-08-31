@@ -37,8 +37,8 @@ int main(int argc, char **argv)
         for (int i = 0; i < n; i++)
             sum += matrix[i][j];
     
-    // END HOTPATH CODE
     auto stop = chrono::high_resolution_clock::now();
+    // END HOTPATH CODE
 
     auto totalTime = chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
