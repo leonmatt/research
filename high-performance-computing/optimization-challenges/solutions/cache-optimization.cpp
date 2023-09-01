@@ -28,8 +28,8 @@ int main(int argc, char **argv)
 
     int matrix[n][n];
 
-    // BEGIN HOTPATH CODE
     auto start = chrono::high_resolution_clock::now();
+    // BEGIN HOTPATH CODE
 
     // Populate matrix
     for (int j = 0; j < n; j++)

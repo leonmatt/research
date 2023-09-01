@@ -24,13 +24,13 @@ int main(int argc, char **argv)
 
     int *nums = new int[10];
 
-    // BEGIN HOTPATH CODE
     auto start = chrono::high_resolution_clock::now();
+    // BEGIN HOTPATH CODE
 
     for(int i = 0; i < 1000000; i++) {}
 
-    // END HOTPATH CODE
     auto stop = chrono::high_resolution_clock::now();
+    // END HOTPATH CODE
 
     delete nums;
 
