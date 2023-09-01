@@ -34,8 +34,8 @@ void increment_b() {
 int main() {
     std::vector<std::thread> threads;
 
-    // BEGIN HOTPATH CODE
     auto start_time = std::chrono::high_resolution_clock::now();
+    // BEGIN HOTPATH CODE
 
     threads.emplace_back(increment_a);
     threads.emplace_back(increment_b);
@@ -44,8 +44,8 @@ int main() {
         t.join();
     }
 
-    auto end_time = std::chrono::high_resolution_clock::now();
     // END HOTPATH CODE
+    auto end_time = std::chrono::high_resolution_clock::now();
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 

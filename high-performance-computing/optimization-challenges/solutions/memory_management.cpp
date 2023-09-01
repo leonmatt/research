@@ -24,8 +24,8 @@ int main(int argc, char **argv)
 
     int *nums = new int[10];
 
-    // BEGIN HOTPATH CODE
     auto start = chrono::high_resolution_clock::now();
+    // BEGIN HOTPATH CODE
 
     for(int i = 0; i < 1000000; i++) {}
 
