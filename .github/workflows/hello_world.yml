@@ -8,6 +8,6 @@ jobs:
   echo_hello:
     runs-on: self-hosted
     steps:
-    - name: Print Hello
-    run: |
-      echo "Hello World!"
+      - name: Print Hello
+        run: |
+          echo "Hello World!"
