@@ -1,0 +1,32 @@
+Architecture Explanation:
+
+Given that we don't know the specific business system that we are building an architecture for, I wrote a generic architecture diagram that
+should be compatible with capturing the large majority of functional and non-functional requirements that we should expect from a system,
+though for systems with more specific requirements, we may need to make specialized changes. This generalized architecture also leaves the
+software architecture decisions to be defined once we have more specific requirements in the future. This means that the architect can decide
+if they want to use a monolith, a microservice, or some other architecture type in the future.
+
+Component Relationships:
+
+This diagram is designed to show the general flow for a system that leverages AI to achieve business outcomes. The major components that we have are
+Data Procurment/Processing Systems, Model Inference/Processing Systems, Metrics/Reliability Systems, and User-Interface Systems. These are going to
+be the systems that you will find in any solution that leverages AI as a core part of the functionality for the business operation system. A lot of these
+things may change, and the architecture can be re-organized, but the point is that we need the aforementioned parts of the system because they are core to
+enabling AI in our systems. We wrote the architecture in this way, because data acquisition must happen before inferencing, inferencing must happen before
+reporting to the business operation function.
+
+Design Principles:
+
+When designing solutions/software architectures, there are several principles that need to come into play. The most important one in my opinion is 
+simplicity and clarity, because the architect must be able to explain the components to the key stakeholders. After that comes the systems that
+incorporate systems for performance, reliability, scalability, and security as these metrics are heavily influenced by the functional and non-functional requirements
+of the system. All of these principles must be balanced when developing the architecture such that we can maximize each while still conforming the system design
+to the requirements for the system that the key stakeholders are interested in.
+
+Understanding Impacts of Changing Components:
+
+While this diagram is quite generic, it shows the components that are going to be required to build a solution that incorporates significant AI functionality
+into the system. If someone made significant changes to the Data Procurement System like adding features that drastically reduced performance, that would be felt
+in every component that relies on the data procurement in order to function properly. It can be difficult to quantify how changes in a component may impact the entire
+system or a series of other components that rely on the changed component. Sometimes the change may impact in a positive, negative, or no real way at all. It depends
+highly on the way the components interact with each other.
