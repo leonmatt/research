@@ -16,7 +16,9 @@ int hello_world(void *ctx) {
 """
 
 b = BPF(text=program)
+
 syscall = b.get_syscall_fnname("execve")
+
 b.attach_kprobe(event=syscall, fn_name="hello_world");
 
 b.trace_print()

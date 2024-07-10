@@ -11,6 +11,7 @@ int hello_world(void *ctx) {
 
     u64 uid = bpf_get_current_uid_gid() & 0xFFFFFFFF;
     u64 counter = 0;
+
     u64 *p = counter_table.lookup(&uid);
     if (p) {
     
